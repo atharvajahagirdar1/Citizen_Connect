@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Report Flow - Citizen Connect</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: #f8fafb;
+      color: #1a1a1a;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .test-section {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .test-button {
+      background: #4285f4;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 5px;
+      transition: all 0.3s ease;
+    }
+    .test-button:hover {
+      background: #3367d6;
+      transform: translateY(-1px);
+    }
+    .status {
+      padding: 10px;
+      border-radius: 6px;
+      margin: 10px 0;
+      font-family: monospace;
+      font-size: 14px;
+    }
+    .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    .data-preview {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 6px;
+      border-left: 4px solid #4285f4;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Test Report Flow</h1>
+  
+  <div class="test-section">
+    <h2>Step 1: Simulate Photo Capture</h2>
+    <button class="test-button" onclick="simulatePhotoCapture()">📸 Simulate Photo Capture</button>
+    <div id="photoStatus" class="status info">No photo data</div>
+  </div>
+
+  <div class="test-section">
+    <h2>Step 2: Simulate Location Selection</h2>
+    <button class="test-button" onclick="simulateLocationSelection()">📍 Simulate Location Selection</button>
+    <div id="locationStatus" class="status info">No location data</div>
+  </div>
+
+  <div class="test-section">
+    <h2>Step 3: Test Report Issue Page</h2>
+    <button class="test-button" onclick="testReportPage()">📝 Test Report Page</button>
+    <div id="reportStatus" class="status info">Report page not tested</div>
+  </div>
+
+  <div class="test-section">
+    <h2>Current Data Status</h2>
+    <button class="test-button" onclick="checkCurrentData()">🔍 Check Current Data</button>
+    <div id="dataStatus" class="status info">Click to check data</div>
+  </div>
+
+  <div class="test-section">
+    <h2>Direct Test Report Page</h2>
+    <button class="test-button" onclick="openReportPage()">🚀 Open Report Page</button>
+    <p>Open the report page directly to test the submit button</p>
+  </div>
+
+  <script>
+    function simulatePhotoCapture() {
+      try {
+        // Create a base64 image data (small red dot)
+        const canvas = document.createElement('canvas');
+        canvas.width = 100;
+        canvas.height = 100;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ff0000';
+        ctx.fillRect(0, 0, 100, 100);
+        
+        const imageData = canvas.toDataURL('image/png');
+        
+        localStorage.setItem('capturedPhoto', imageData);
+        localStorage.setItem('photoTimestamp', new Date().toISOString());
+        
+        document.getElementById('photoStatus').innerHTML = `
+          <div class="success">✅ Photo captured successfully</div>
+          <div class="data-preview">Photo size: ${imageData.length} characters<br>Timestamp: ${new Date().toISOString()}</div>
+        `;
+        
+        console.log('Photo data saved:', imageData.substring(0, 50) + '...');
+      } catch (error) {
+        document.getElementById('photoStatus').innerHTML = `
+          <div class="error">❌ Error simulating photo: ${error.message}</div>
+        `;
+        console.error('Photo simulation error:', error);
+      }
+    }
+
+    function simulateLocationSelection() {
+      try {
+        const locationData = {
+          address: "123 Main Street, Downtown, City",
+          lat: 40.7128,
+          lon: -74.0060,
+          manual: false,
+          timestamp: new Date().toISOString()
+        };
+        
+        localStorage.setItem('reportLocation', JSON.stringify(locationData));
+        localStorage.setItem('reportedIssueLocation', locationData.address);
+        
+        document.getElementById('locationStatus').innerHTML = `
+          <div class="success">✅ Location selected successfully</div>
+          <div class="data-preview">Address: ${locationData.address}<br>Coordinates: ${locationData.lat}, ${locationData.lon}</div>
+        `;
+        
+        console.log('Location data saved:', locationData);
+      } catch (error) {
+        document.getElementById('locationStatus').innerHTML = `
+          <div class="error">❌ Error simulating location: ${error.message}</div>
+        `;
+        console.error('Location simulation error:', error);
+      }
+    }
+
+    function testReportPage() {
+      try {
+        // Check if we have the required data
+        const photo = localStorage.getItem('capturedPhoto');
+        const location = localStorage.getItem('reportedIssueLocation');
+        
+        if (!photo) {
+          document.getElementById('reportStatus').innerHTML = `
+            <div class="error">❌ No photo data found. Please simulate photo capture first.</div>
+          `;
+          return;
+        }
+        
+        if (!location) {
+          document.getElementById('reportStatus').innerHTML = `
+            <div class="error">❌ No location data found. Please simulate location selection first.</div>
+          `;
+          return;
+        }
+        
+        document.getElementById('reportStatus').innerHTML = `
+          <div class="success">✅ All required data available</div>
+          <div class="data-preview">Photo: Available<br>Location: ${location}</div>
+        `;
+        
+      } catch (error) {
+        document.getElementById('reportStatus').innerHTML = `
+          <div class="error">❌ Error testing report page: ${error.message}</div>
+        `;
+        console.error('Report page test error:', error);
+      }
+    }
+
+    function checkCurrentData() {
+      try {
+        const photo = localStorage.getItem('capturedPhoto');
+        const location = localStorage.getItem('reportedIssueLocation');
+        const locationData = localStorage.getItem('reportLocation');
+        const photoTimestamp = localStorage.getItem('photoTimestamp');
+        
+        let status = '<div class="info">📊 Current localStorage Data:</div>';
+        
+        if (photo) {
+          status += `<div class="data-preview">✅ Photo: Available (${photo.length} characters)<br>Timestamp: ${photoTimestamp || 'N/A'}</div>`;
+        } else {
+          status += '<div class="error">❌ Photo: Not found</div>';
+        }
+        
+        if (location) {
+          status += `<div class="data-preview">✅ Location: ${location}</div>`;
+        } else {
+          status += '<div class="error">❌ Location: Not found</div>';
+        }
+        
+        if (locationData) {
+          const parsed = JSON.parse(locationData);
+          status += `<div class="data-preview">✅ Location Data: ${parsed.address}</div>`;
+        } else {
+          status += '<div class="error">❌ Location Data: Not found</div>';
+        }
+        
+        // Check for existing issues
+        const userIssues = localStorage.getItem('userIssues');
+        if (userIssues) {
+          const issues = JSON.parse(userIssues);
+          status += `<div class="data-preview">📋 Existing Issues: ${issues.length} reports</div>`;
+        } else {
+          status += '<div class="info">📋 Existing Issues: None</div>';
+        }
+        
+        document.getElementById('dataStatus').innerHTML = status;
+        
+      } catch (error) {
+        document.getElementById('dataStatus').innerHTML = `
+          <div class="error">❌ Error checking data: ${error.message}</div>
+        `;
+        console.error('Data check error:', error);
+      }
+    }
+
+    function openReportPage() {
+      window.location.href = '../User UI/Report Issue Page/index.html';
+    }
+
+    // Initialize on load
+    window.onload = function() {
+      checkCurrentData();
+    };
+  </script>
+</body>
+</html>

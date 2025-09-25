@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-translate="reporting">Reporting Dashboard - Citizen Connect</title>
+  <script src="../js/languageManager.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: #f8fafb;
+      color: #1a1a1a;
+      padding-bottom: 80px;
+    }
+
+    .container {
+      max-width: 430px;
+      margin: 0 auto;
+      background: white;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 50px 20px 30px 20px;
+      background: white;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .back-button {
+      background: #f5f5f5;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-right: 15px;
+      font-size: 18px;
+      transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+      background: #fff3cd;
+      transform: scale(1.05);
+    }
+
+    .header-title {
+      flex: 1;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      padding: 20px;
+      background: white;
+    }
+
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .action-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 25px 20px;
+      border-radius: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .action-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .action-card.photo {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    }
+
+    .action-card.location {
+      background: linear-gradient(135deg, #4ecdc4, #44a08d);
+      box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+    }
+
+    .action-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .action-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .action-subtitle {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    /* Report Categories */
+    .categories-section {
+      padding: 0 20px 20px 20px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #1a1a1a;
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .category-item {
+      background: white;
+      padding: 20px 15px;
+      border-radius: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+      border: 2px solid transparent;
+    }
+
+    .category-item:hover {
+      background: #fff3cd;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border-color: #ffc107;
+    }
+
+    .category-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .category-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #1a1a1a;
+      line-height: 1.2;
+    }
+
+    /* Recent Reports */
+    .recent-section {
+      padding: 20px;
+      background: #f8fafb;
+    }
+
+    .recent-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .view-all-btn {
+      color: #4285f4;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .view-all-btn:hover {
+      text-decoration: underline;
+    }
+
+    .recent-item {
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid #f0f0f0;
+    }
+
+    .recent-item:hover {
+      background: #fff3cd;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border-color: #ffc107;
+    }
+
+    .recent-image {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-right: 15px;
+      background: #f0f0f0;
+    }
+
+    .recent-content {
+      flex: 1;
+    }
+
+    .recent-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+
+    .recent-meta {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .recent-status {
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+
+    .status-reported {
+      background: #cce5ff;
+      color: #0056b3;
+    }
+
+    .status-progress {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-resolved {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    /* Emergency Section */
+    .emergency-section {
+      padding: 20px;
+      background: white;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .emergency-card {
+      background: linear-gradient(135deg, #ff4757, #ff3838);
+      color: white;
+      padding: 20px;
+      border-radius: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      width: 100%;
+      box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+    }
+
+    .emergency-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+    }
+
+    .emergency-icon {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .emergency-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .emergency-subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      background: white;
+      border-top: 1px solid #e0e0e0;
+      padding: 12px 0 20px 0;
+      box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    .nav-items {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 8px 12px;
+      border-radius: 12px;
+      min-width: 60px;
+    }
+
+    .nav-item:hover {
+      background: #fff3cd;
+      transform: translateY(-2px);
+    }
+
+    .nav-item.active {
+      background: #4285f4;
+      color: white;
+    }
+
+    .nav-icon {
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+
+    .nav-label {
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 430px) {
+      .container {
+        max-width: 100%;
+      }
+      
+      .bottom-nav {
+        max-width: 100%;
+      }
+      
+      .categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <button class="back-button" onclick="goBack()">
+        ←
+      </button>
+      <div class="header-title" data-translate="reporting">Reporting Dashboard</div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <div class="actions-grid">
+        <button class="action-card photo" onclick="capturePhoto()">
+          <span class="action-icon">📷</span>
+          <div class="action-title" data-translate="takePhoto">Take Photo</div>
+          <div class="action-subtitle" data-translate="captureIssue">Capture the issue</div>
+        </button>
+        
+        <button class="action-card location" onclick="selectLocation()">
+          <span class="action-icon">📍</span>
+          <div class="action-title" data-translate="addLocation">Add Location</div>
+          <div class="action-subtitle" data-translate="pinLocation">Pin the location</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Report Categories -->
+    <div class="categories-section">
+      <h2 class="section-title" data-translate="reportCategories">Report Categories</h2>
+      <div class="categories-grid">
+        <div class="category-item" onclick="reportByCategory('Roads')">
+          <span class="category-icon">🛣️</span>
+          <div class="category-title" data-translate="roads">Roads</div>
+        </div>
+        
+        <div class="category-item" onclick="reportByCategory('Water')">
+          <span class="category-icon">💧</span>
+          <div class="category-title" data-translate="water">Water</div>
+        </div>
+        
+        <div class="category-item" onclick="reportByCategory('Electricity')">
+          <span class="category-icon">⚡</span>
+          <div class="category-title" data-translate="electricity">Electricity</div>
+        </div>
+        
+        <div class="category-item" onclick="reportByCategory('Waste')">
+          <span class="category-icon">🗑️</span>
+          <div class="category-title" data-translate="waste">Waste</div>
+        </div>
+        
+        <div class="category-item" onclick="reportByCategory('Street Lights')">
+          <span class="category-icon">💡</span>
+          <div class="category-title" data-translate="streetLights">Street Lights</div>
+        </div>
+        
+        <div class="category-item" onclick="reportByCategory('Other')">
+          <span class="category-icon">📝</span>
+          <div class="category-title" data-translate="other">Other</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Reports -->
+    <div class="recent-section">
+      <div class="recent-header">
+        <h2 class="section-title" data-translate="recentReports">Recent Reports</h2>
+        <a href="#" class="view-all-btn" onclick="viewAllReports()" data-translate="viewAll">View All</a>
+      </div>
+      
+      <div id="recentReportsContainer">
+        <!-- Recent reports will be populated here -->
+      </div>
+    </div>
+
+    <!-- Emergency Reporting -->
+    <div class="emergency-section">
+      <button class="emergency-card" onclick="emergencyReport()">
+        <div class="emergency-icon">🚨</div>
+        <div class="emergency-title" data-translate="emergency">Emergency Report</div>
+        <div class="emergency-subtitle" data-translate="urgentIssues">For urgent civic issues</div>
+      </button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-items">
+        <div class="nav-item" onclick="goToHome()">
+          <div class="nav-icon">🏠</div>
+          <div class="nav-label" data-translate="home">Home</div>
+        </div>
+        <div class="nav-item active" onclick="startReporting()">
+          <div class="nav-icon">📷</div>
+          <div class="nav-label" data-translate="report">Report</div>
+        </div>
+        <div class="nav-item" onclick="viewMyIssues()">
+          <div class="nav-icon">📋</div>
+          <div class="nav-label" data-translate="myIssues">My Issues</div>
+        </div>
+        <div class="nav-item" onclick="exploreMap()">
+          <div class="nav-icon">🗺️</div>
+          <div class="nav-label" data-translate="map">Map</div>
+        </div>
+        <div class="nav-item" onclick="showProfile()">
+          <div class="nav-icon">👤</div>
+          <div class="nav-label" data-translate="profile">Profile</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Load recent reports
+    function loadRecentReports() {
+      const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+      const container = document.getElementById('recentReportsContainer');
+      
+      if (userIssues.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px; color: #6b7280;">
+            <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
+            <div style="font-size: 16px; font-weight: 600; margin-bottom: 5px;">No reports yet</div>
+            <div style="font-size: 14px;">Start by reporting your first civic issue</div>
+          </div>
+        `;
+        return;
+      }
+
+      // Show last 3 reports
+      const recentReports = userIssues.slice(-3).reverse();
+      
+      container.innerHTML = recentReports.map(report => `
+        <div class="recent-item" onclick="viewReportDetails('${report.id}')">
+          ${report.image && report.image.startsWith('data:image/') ? 
+            `<img src="${report.image}" alt="Report" class="recent-image">` :
+            '<div class="recent-image" style="background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">📷</div>'
+          }
+          <div class="recent-content">
+            <div class="recent-title">${report.description || report.category || 'Issue Report'}</div>
+            <div class="recent-meta">${formatDate(report.timestamp)}</div>
+          </div>
+          <div class="recent-status status-${getStatusClass(report.status)}">
+            ${report.status || 'Reported'}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function formatDate(dateString) {
+      try {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 1) return 'Today';
+        if (diffDays === 2) return 'Yesterday';
+        if (diffDays <= 7) return `${diffDays} days ago`;
+        
+        return date.toLocaleDateString();
+      } catch (error) {
+        return 'Recent';
+      }
+    }
+
+    function getStatusClass(status) {
+      switch(status) {
+        case 'Reported': return 'reported';
+        case 'In Progress': return 'progress';
+        case 'Resolved': return 'resolved';
+        default: return 'reported';
+      }
+    }
+
+    // Action functions
+    function capturePhoto() {
+      window.location.href = '../Capture Photo Page/index.html';
+    }
+
+    function selectLocation() {
+      window.location.href = '../Location Selection Page/index.html';
+    }
+
+    function reportByCategory(category) {
+      // Store selected category for the report flow
+      localStorage.setItem('selectedCategory', category);
+      window.location.href = '../Capture Photo Page/index.html';
+    }
+
+    function emergencyReport() {
+      // Set emergency flag for priority reporting
+      localStorage.setItem('isEmergencyReport', 'true');
+      localStorage.setItem('selectedCategory', 'Emergency');
+      window.location.href = '../Capture Photo Page/index.html';
+    }
+
+    function viewReportDetails(reportId) {
+      window.location.href = `../Report Details Page/index.html?id=${reportId}`;
+    }
+
+    function viewAllReports() {
+      window.location.href = '../My Issues Page/index.html';
+    }
+
+    // Navigation functions
+    function goBack() {
+      window.history.back();
+    }
+
+    function goToHome() {
+      window.location.href = '../Main UI/index.html';
+    }
+
+    function startReporting() {
+      // Already on reporting page
+      console.log('Already on reporting dashboard');
+    }
+
+    function viewMyIssues() {
+      window.location.href = '../My Issues Page/index.html';
+    }
+
+    function exploreMap() {
+      window.location.href = '../Explore Map Page/index.html';
+    }
+
+    function showProfile() {
+      window.location.href = '../Profile Page/index.html';
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      loadRecentReports();
+      
+      // Initialize language manager if available
+      if (typeof window.languageManager !== 'undefined') {
+        try {
+          window.languageManager.updatePageTranslations();
+        } catch (error) {
+          console.error('Error with language manager:', error);
+        }
+      }
+      
+      // Check if coming from a specific flow
+      const selectedCategory = localStorage.getItem('selectedCategory');
+      if (selectedCategory) {
+        console.log('Selected category:', selectedCategory);
+        // Category is already stored for the reporting flow
+      }
+    });
+  </script>
+</body>
+</html>

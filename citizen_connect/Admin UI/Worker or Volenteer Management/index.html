@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Worker Management Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+</head>
+<body>
+    <div class="container">
+
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="back-button" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1>Worker Management</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" id="addTaskBtn">
+                    <i class="fas fa-plus"></i> Add Task
+                </button>
+                <button class="btn btn-secondary">Settings</button>
+                <button class="logout-btn">Logout</button>
+            </div>
+        </header>
+
+        <!-- Dashboard Cards -->
+        <section class="dashboard-cards">
+            <div class="metric-card">
+                <h3>Total Workers</h3>
+                <div class="metric-value">128</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> 5.4%
+                </div>
+            </div>
+            <div class="metric-card">
+                <h3>Active Tasks</h3>
+                <div class="metric-value">45</div>
+                <div class="metric-change negative">
+                    <i class="fas fa-arrow-down"></i> 1.2%
+                </div>
+            </div>
+            <div class="metric-card">
+                <h3>Completed Today</h3>
+                <div class="metric-value">18</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> 10%
+                </div>
+            </div>
+        </section>
+
+        <!-- Tasks Section -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Tasks Overview</h2>
+                <div class="section-actions">
+                    <input type="search" placeholder="Search tasks..." class="form-control search" />
+                    <select class="form-control">
+                        <option>All Priorities</option>
+                        <option>High</option>
+                        <option>Medium</option>
+                        <option>Low</option>
+                    </select>
+                </div>
+            </div>
+            <div class="section-content tasks-grid">
+
+                <!-- Task Card -->
+                <div class="task-card high-priority">
+                    <div class="task-header">
+                        <h4>Fix Road Potholes</h4>
+                    </div>
+                    <div class="task-description">
+                        Repair all potholes on Main Street to improve traffic flow.
+                    </div>
+                    <div class="task-meta">
+                        <div class="task-worker">
+                            <i class="fas fa-user"></i> John Doe
+                        </div>
+                        <div class="task-deadline">
+                            <i class="fas fa-calendar-alt"></i> Due: Sep 30
+                        </div>
+                    </div>
+                    <div class="task-footer">
+                        <div class="task-count">3 Subtasks</div>
+                        <div class="task-actions">
+                            <button class="btn-icon" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon btn-danger" title="Delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- More task cards -->
+                <div class="task-card medium-priority">
+                    <div class="task-header">
+                        <h4>Sanitation Inspection</h4>
+                    </div>
+                    <div class="task-description">
+                        Inspect sanitation systems in the downtown area.
+                    </div>
+                    <div class="task-meta">
+                        <div class="task-worker">
+                            <i class="fas fa-user"></i> Mary Smith
+                        </div>
+                        <div class="task-deadline">
+                            <i class="fas fa-calendar-alt"></i> Due: Oct 5
+                        </div>
+                    </div>
+                    <div class="task-footer">
+                        <div class="task-count">5 Subtasks</div>
+                        <div class="task-actions">
+                            <button class="btn-icon" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon btn-danger" title="Delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card low-priority">
+                    <div class="task-header">
+                        <h4>Update Traffic Signs</h4>
+                    </div>
+                    <div class="task-description">
+                        Replace old traffic signs with new reflective signs.
+                    </div>
+                    <div class="task-meta">
+                        <div class="task-worker">
+                            <i class="fas fa-user"></i> Alex Lee
+                        </div>
+                        <div class="task-deadline">
+                            <i class="fas fa-calendar-alt"></i> Due: Oct 12
+                        </div>
+                    </div>
+                    <div class="task-footer">
+                        <div class="task-count">2 Subtasks</div>
+                        <div class="task-actions">
+                            <button class="btn-icon" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon btn-danger" title="Delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Modal for Adding Task -->
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Task</h2>
+                <button class="close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="taskForm">
+                    <div class="form-group">
+                        <label for="taskTitle">Task Title</label>
+                        <input type="text" id="taskTitle" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDescription">Description</label>
+                        <textarea id="taskDescription" class="form-control" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskPriority">Priority</label>
+                            <select id="taskPriority" class="form-control" required>
+                                <option value="">Select Priority</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskDeadline">Deadline</label>
+                            <input type="date" id="taskDeadline" class="form-control" required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskWorker">Assign to</label>
+                        <input type="text" id="taskWorker" class="form-control" required placeholder="Worker name" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      // Modal toggle JS
+      const addTaskBtn = document.getElementById('addTaskBtn');
+      const modal = document.getElementById('taskModal');
+      const closeModal = document.getElementById('closeModal');
+      const cancelBtn = document.getElementById('cancelBtn');
+
+      addTaskBtn.addEventListener('click', () => modal.style.display = 'block');
+      closeModal.addEventListener('click', () => modal.style.display = 'none');
+      cancelBtn.addEventListener('click', () => modal.style.display = 'none');
+
+      window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+
+      // Back button functionality
+      function goBack() {
+        window.history.back();
+      }
+
+      // You can add form submission handling here if needed
+    </script>
+</body>
+</html>

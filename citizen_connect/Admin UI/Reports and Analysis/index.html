@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports & Analysis - Civic Management Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <script>
+        // Session management
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            
+            // Add logout functionality to header
+            const headerActions = document.querySelector('.header-actions');
+            const logoutBtn = document.createElement('button');
+            logoutBtn.className = 'btn btn-danger';
+            logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+            logoutBtn.onclick = logout;
+            headerActions.appendChild(logoutBtn);
+        });
+
+        function checkAuthentication() {
+            const adminData = localStorage.getItem('adminData');
+            if (!adminData) {
+                window.location.href = '../Login/index.html';
+                return;
+            }
+            
+            // Parse the admin data and check if user is logged in
+            const admin = JSON.parse(adminData);
+            if (!admin.isLoggedIn) {
+                window.location.href = '../Login/index.html';
+                return;
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Remove the isLoggedIn flag but keep other data
+                const adminData = localStorage.getItem('adminData');
+                if (adminData) {
+                    const admin = JSON.parse(adminData);
+                    admin.isLoggedIn = false;
+                    localStorage.setItem('adminData', JSON.stringify(admin));
+                }
+                window.location.href = '../Login/index.html';
+            }
+        }
+
+        // Add some CSS for the logout button
+        const style = document.createElement('style');
+        style.textContent = `
+            .btn-danger {
+                background: linear-gradient(135deg, #dc3545, #c82333);
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                margin-left: 10px;
+            }
+            .btn-danger:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 15px rgba(220, 53, 69, 0.4);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <button class="back-button" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <i class="fas fa-chart-line"></i>
+                <h1>Reports & Analysis</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="exportReport('pdf')">
+                    <i class="fas fa-file-pdf"></i> Export PDF
+                </button>
+                <button class="btn btn-secondary" onclick="exportReport('excel')">
+                    <i class="fas fa-file-excel"></i> Export Excel
+                </button>
+                <button class="btn btn-primary" onclick="generateCustomReport()">
+                    <i class="fas fa-plus"></i> Custom Report
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+        <button class="nav-tab active" onclick="showTab('dashboard')">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </button>
+        <button class="nav-tab" onclick="showTab('issueReports')">
+            <i class="fas fa-exclamation-triangle"></i> Issue Reports
+        </button>
+        <button class="nav-tab" onclick="showTab('performance')">
+            <i class="fas fa-chart-bar"></i> Performance Analytics
+        </button>
+        <button class="nav-tab" onclick="showTab('trends')">
+            <i class="fas fa-trending-up"></i> Trends & Insights
+        </button>
+        <button class="nav-tab" onclick="showTab('geographic')">
+            <i class="fas fa-map-marked-alt"></i> Geographic Analysis
+        </button>
+        <button class="nav-tab" onclick="showTab('custom')">
+            <i class="fas fa-filter"></i> Custom Reports
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="dashboard-header">
+                <h2>Analytics Dashboard</h2>
+                <div class="date-filter">
+                    <select id="timeRange" onchange="updateDashboard()">
+                        <option value="7">Last 7 Days</option>
+                        <option value="30" selected>Last 30 Days</option>
+                        <option value="90">Last 90 Days</option>
+                        <option value="365">Last Year</option>
+                    </select>
+                    <button class="btn btn-outline" onclick="refreshDashboard()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Key Metrics Cards -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Total Issues</h3>
+                        <div class="metric-value" id="totalIssues">1,247</div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i> +12.5% from last month
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Resolved Issues</h3>
+                        <div class="metric-value" id="resolvedIssues">892</div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i> +8.3% from last month
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Avg Resolution Time</h3>
+                        <div class="metric-value" id="avgResolutionTime">3.2 days</div>
+                        <div class="metric-change negative">
+                            <i class="fas fa-arrow-down"></i> -15.7% from last month
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Resolution Rate</h3>
+                        <div class="metric-value" id="resolutionRate">71.5%</div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i> +5.2% from last month
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Active Citizens</h3>
+                        <div class="metric-value" id="activeCitizens">2,847</div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i> +23.1% from last month
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>User Satisfaction</h3>
+                        <div class="metric-value" id="userSatisfaction">4.2/5</div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i> +0.3 from last month
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Issue Volume Trends</h3>
+                        <div class="chart-controls">
+                            <button class="btn-chart active" onclick="updateVolumeChart('daily')">Daily</button>
+                            <button class="btn-chart" onclick="updateVolumeChart('weekly')">Weekly</button>
+                            <button class="btn-chart" onclick="updateVolumeChart('monthly')">Monthly</button>
+                        </div>
+                    </div>
+                    <canvas id="volumeChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Issue Categories Distribution</h3>
+                    </div>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="activity-section">
+                <h3>Recent Activity</h3>
+                <div class="activity-list" id="recentActivity">
+                    <!-- Activity items will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Issue Reports Tab -->
+        <div id="issueReports" class="tab-content">
+            <div class="reports-header">
+                <h2>Issue Reports Analysis</h2>
+                <div class="report-filters">
+                    <select id="reportType" onchange="updateIssueReports()">
+                        <option value="summary">Summary Report</option>
+                        <option value="detailed">Detailed Report</option>
+                        <option value="comparison">Comparison Report</option>
+                    </select>
+                    <select id="reportCategory" onchange="updateIssueReports()">
+                        <option value="all">All Categories</option>
+                        <option value="infrastructure">Infrastructure</option>
+                        <option value="environment">Environment</option>
+                        <option value="safety">Safety</option>
+                        <option value="utilities">Utilities</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="reports-grid">
+                <div class="report-card">
+                    <h3>Issue Status Breakdown</h3>
+                    <canvas id="statusChart"></canvas>
+                </div>
+
+                <div class="report-card">
+                    <h3>Priority Distribution</h3>
+                    <canvas id="priorityChart"></canvas>
+                </div>
+
+                <div class="report-card">
+                    <h3>Resolution Timeline</h3>
+                    <canvas id="timelineChart"></canvas>
+                </div>
+
+                <div class="report-card">
+                    <h3>Top Issue Types</h3>
+                    <div class="issue-types-list" id="topIssueTypes">
+                        <!-- Top issue types will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="detailed-table">
+                <h3>Detailed Issue Report</h3>
+                <div class="table-controls">
+                    <input type="text" id="tableSearch" placeholder="Search issues..." onkeyup="searchTable()">
+                    <button class="btn btn-outline" onclick="exportTable()">
+                        <i class="fas fa-download"></i> Export Data
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table id="issuesTable">
+                        <thead>
+                            <tr>
+                                <th>Issue ID</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Reported Date</th>
+                                <th>Resolution Time</th>
+                                <th>Reporter</th>
+                            </tr>
+                        </thead>
+                        <tbody id="issuesTableBody">
+                            <!-- Table data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Analytics Tab -->
+        <div id="performance" class="tab-content">
+            <div class="performance-header">
+                <h2>Performance Analytics</h2>
+                <div class="performance-filters">
+                    <select id="performanceMetric" onchange="updatePerformance()">
+                        <option value="response-time">Response Time</option>
+                        <option value="resolution-rate">Resolution Rate</option>
+                        <option value="user-satisfaction">User Satisfaction</option>
+                        <option value="worker-efficiency">Worker Efficiency</option>
+                    </select>
+                    <select id="performanceTimeframe" onchange="updatePerformance()">
+                        <option value="week">This Week</option>
+                        <option value="month" selected>This Month</option>
+                        <option value="quarter">This Quarter</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="performance-grid">
+                <div class="performance-card">
+                    <h3>Response Time Trends</h3>
+                    <canvas id="responseTimeChart"></canvas>
+                </div>
+
+                <div class="performance-card">
+                    <h3>Resolution Rate by Worker</h3>
+                    <canvas id="workerPerformanceChart"></canvas>
+                </div>
+
+                <div class="performance-card">
+                    <h3>System Performance Metrics</h3>
+                    <div class="metrics-list" id="systemMetrics">
+                        <!-- System metrics will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="performance-card">
+                    <h3>User Satisfaction Trends</h3>
+                    <canvas id="satisfactionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trends & Insights Tab -->
+        <div id="trends" class="tab-content">
+            <div class="trends-header">
+                <h2>Trends & Insights</h2>
+                <div class="trends-controls">
+                    <button class="btn-insight" onclick="generateInsights()">
+                        <i class="fas fa-lightbulb"></i> Generate Insights
+                    </button>
+                    <select id="trendType" onchange="updateTrends()">
+                        <option value="seasonal">Seasonal Trends</option>
+                        <option value="predictive">Predictive Analysis</option>
+                        <option value="correlation">Correlation Analysis</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="insights-section">
+                <h3>Key Insights</h3>
+                <div class="insights-grid" id="keyInsights">
+                    <!-- Insights will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="trends-charts">
+                <div class="trend-chart-container">
+                    <h3>Seasonal Issue Patterns</h3>
+                    <canvas id="seasonalChart"></canvas>
+                </div>
+
+                <div class="trend-chart-container">
+                    <h3>Predictive Issue Volume</h3>
+                    <canvas id="predictiveChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Geographic Analysis Tab -->
+        <div id="geographic" class="tab-content">
+            <div class="geographic-header">
+                <h2>Geographic Analysis</h2>
+                <div class="geo-controls">
+                    <select id="geoMetric" onchange="updateGeographic()">
+                        <option value="issue-density">Issue Density</option>
+                        <option value="resolution-rate">Resolution Rate</option>
+                        <option value="response-time">Response Time</option>
+                        <option value="user-activity">User Activity</option>
+                    </select>
+                    <button class="btn btn-outline" onclick="toggleHeatmap()">
+                        <i class="fas fa-fire"></i> Toggle Heatmap
+                    </button>
+                </div>
+            </div>
+
+            <div class="geographic-content">
+                <div class="map-container">
+                    <div class="map-placeholder" id="geoMap">
+                        <i class="fas fa-map"></i>
+                        <p>Interactive Map View</p>
+                        <small>Issue density and geographic patterns will be displayed here</small>
+                    </div>
+                </div>
+
+                <div class="geo-stats">
+                    <div class="geo-stat-card">
+                        <h4>Top Issue Areas</h4>
+                        <div class="area-list" id="topAreas">
+                            <!-- Top areas will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="geo-stat-card">
+                        <h4>Area Performance</h4>
+                        <canvas id="areaPerformanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Reports Tab -->
+        <div id="custom" class="tab-content">
+            <div class="custom-header">
+                <h2>Custom Reports</h2>
+                <button class="btn btn-primary" onclick="createCustomReport()">
+                    <i class="fas fa-plus"></i> Create New Report
+                </button>
+            </div>
+
+            <div class="custom-report-builder" id="reportBuilder">
+                <div class="builder-section">
+                    <h3>Report Configuration</h3>
+                    <div class="form-group">
+                        <label>Report Name</label>
+                        <input type="text" id="reportName" placeholder="Enter report name">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="reportDescription" placeholder="Enter report description"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" id="reportStartDate">
+                        </div>
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="date" id="reportEndDate">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="builder-section">
+                    <h3>Data Selection</h3>
+                    <div class="data-categories">
+                        <label class="checkbox-group">
+                            <input type="checkbox" value="issues" checked> Issues Data
+                        </label>
+                        <label class="checkbox-group">
+                            <input type="checkbox" value="users" checked> User Data
+                        </label>
+                        <label class="checkbox-group">
+                            <input type="checkbox" value="performance" checked> Performance Data
+                        </label>
+                        <label class="checkbox-group">
+                            <input type="checkbox" value="geographic" checked> Geographic Data
+                        </label>
+                    </div>
+                </div>
+
+                <div class="builder-section">
+                    <h3>Metrics & Visualizations</h3>
+                    <div class="metrics-grid-custom">
+                        <label class="checkbox-group">
+                            <input type="checkbox" value="volume-trends" checked> Volume Trends
+                        </label>
+                        <label class="checkbox-group">
+                            <input type="checkbox" value="category-breakdown" checked> Category Breakdown
+                        </label>
+                        <label class="checkbox-group">
+                            <input type="checkbox" value="resolution-rates" checked> Resolution Rates
+                        </label>
+                        <label class="checkbox-group">
+                            <input type="checkbox" value="response-times" checked> Response Times
+                        </label>
+                        <label class="checkbox-group">
+                            <input type="checkbox" value="user-satisfaction" checked> User Satisfaction
+                        </label>
+                        <label class="checkbox-group">
+                            <input type="checkbox" value="geographic-analysis" checked> Geographic Analysis
+                        </label>
+                    </div>
+                </div>
+
+                <div class="builder-actions">
+                    <button class="btn btn-primary" onclick="generateCustomReport()">
+                        <i class="fas fa-chart-bar"></i> Generate Report
+                    </button>
+                    <button class="btn btn-outline" onclick="saveReportTemplate()">
+                        <i class="fas fa-save"></i> Save Template
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetReportBuilder()">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                </div>
+            </div>
+
+            <div class="saved-reports">
+                <h3>Saved Reports</h3>
+                <div class="reports-list" id="savedReports">
+                    <!-- Saved reports will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Custom Report Modal -->
+    <div id="customReportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Custom Report Preview</h3>
+                <button class="close-btn" onclick="closeCustomReportModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="customReportPreview">
+                <!-- Custom report preview will be populated here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeCustomReportModal()">Close</button>
+                <button class="btn btn-primary" onclick="exportCustomReport()">
+                    <i class="fas fa-download"></i> Export Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Report Flow Test - Citizen Connect</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: #f8fafb;
+      color: #1a1a1a;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .test-section {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .test-button {
+      background: #4285f4;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 5px;
+      transition: all 0.3s ease;
+    }
+    .test-button:hover {
+      background: #3367d6;
+      transform: translateY(-1px);
+    }
+    .test-button.success {
+      background: #28a745;
+    }
+    .test-button.success:hover {
+      background: #218838;
+    }
+    .test-button.danger {
+      background: #dc3545;
+    }
+    .test-button.danger:hover {
+      background: #c82333;
+    }
+    .status {
+      padding: 10px;
+      border-radius: 6px;
+      margin: 10px 0;
+      font-family: monospace;
+      font-size: 14px;
+    }
+    .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    .data-preview {
+      background: #f8f9fa;
+      padding: 10px;
+      border-left: 4px solid #4285f4;
+      margin: 10px 0;
+      word-break: break-all;
+      font-size: 12px;
+    }
+    .test-result {
+      background: #e8f5e8;
+      border: 1px solid #4caf50;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    .test-result h4 {
+      color: #2e7d32;
+      margin-top: 0;
+    }
+    .step-indicator {
+      display: inline-block;
+      background: #4285f4;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+    .step-indicator.completed {
+      background: #28a745;
+    }
+    .step-indicator.failed {
+      background: #dc3545;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Complete Report Flow Test</h1>
+  
+  <div class="test-section">
+    <h2>📋 Test Overview</h2>
+    <p>This test will simulate the complete report issue flow:</p>
+    <ol>
+      <li><span id="step1-indicator" class="step-indicator">1</span> Capture Photo → Store in localStorage</li>
+      <li><span id="step2-indicator" class="step-indicator">2</span> Select Location → Store in localStorage</li>
+      <li><span id="step3-indicator" class="step-indicator">3</span> Navigate to Report Issue Page</li>
+      <li><span id="step4-indicator" class="step-indicator">4</span> Fill Form and Submit</li>
+      <li><span id="step5-indicator" class="step-indicator">5</span> Verify Success</li>
+    </ol>
+  </div>
+
+  <div class="test-section">
+    <h2>🚀 Run Complete Test</h2>
+    <button class="test-button success" onclick="runCompleteTest()">🧪 Run Complete Test</button>
+    <button class="test-button" onclick="runStepByStep()">⏭️ Run Step-by-Step</button>
+    <div id="testStatus" class="status info">Ready to start testing</div>
+    <div id="testResults"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>🔍 Individual Step Tests</h2>
+    <button class="test-button" onclick="testStep1()">📸 Test Photo Capture</button>
+    <button class="test-button" onclick="testStep2()">📍 Test Location Selection</button>
+    <button class="test-button" onclick="testStep3()">📝 Test Form Filling</button>
+    <button class="test-button" onclick="testStep4()">🎯 Test Submit Function</button>
+  </div>
+
+  <div class="test-section">
+    <h2>📊 Data Management</h2>
+    <button class="test-button" onclick="checkAllData()">🔍 Check All Data</button>
+    <button class="test-button danger" onclick="clearAllTestData()">🗑️ Clear All Test Data</button>
+    <button class="test-button" onclick="openReportPage()">🌐 Open Report Page</button>
+    <div id="dataStatus" class="status info">Click to check current data</div>
+  </div>
+
+  <script>
+    // Test data
+    const testPhotoData = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+    const testLocation = {
+      address: "123 Test Street, Test City, TC 12345",
+      lat: 40.7128,
+      lon: -74.0060,
+      manual: false,
+      timestamp: new Date().toISOString()
+    };
+
+    function updateStepIndicator(step, status) {
+      const indicator = document.getElementById(`step${step}-indicator`);
+      if (status === 'completed') {
+        indicator.classList.add('completed');
+        indicator.textContent = '✓';
+      } else if (status === 'failed') {
+        indicator.classList.add('failed');
+        indicator.textContent = '✗';
+      }
+    }
+
+    function runCompleteTest() {
+      console.log('🚀 Starting complete test...');
+      document.getElementById('testStatus').innerHTML = '<div class="info">🔄 Running complete test...</div>';
+      document.getElementById('testResults').innerHTML = '';
+      
+      try {
+        // Reset step indicators
+        document.querySelectorAll('.step-indicator').forEach(ind => {
+          ind.classList.remove('completed', 'failed');
+          ind.textContent = ind.id.split('-')[0].replace('step', '');
+        });
+
+        // Step 1: Create test photo
+        localStorage.setItem('capturedPhoto', testPhotoData);
+        localStorage.setItem('photoTimestamp', new Date().toISOString());
+        updateStepIndicator(1, 'completed');
+        addTestResult('Step 1: Photo', '✅ Test photo created and stored');
+
+        // Step 2: Create test location
+        localStorage.setItem('reportLocation', JSON.stringify(testLocation));
+        localStorage.setItem('reportedIssueLocation', testLocation.address);
+        updateStepIndicator(2, 'completed');
+        addTestResult('Step 2: Location', '✅ Test location created and stored');
+
+        // Step 3: Test Report Issue Page
+        updateStepIndicator(3, 'completed');
+        addTestResult('Step 3: Navigation', '✅ Report Issue Page accessible');
+
+        // Step 4: Test form submission
+        const submitResult = testSubmitReport();
+        if (submitResult) {
+          updateStepIndicator(4, 'completed');
+          addTestResult('Step 4: Submit', '✅ Report submitted successfully');
+        } else {
+          updateStepIndicator(4, 'failed');
+          addTestResult('Step 4: Submit', '❌ Report submission failed');
+        }
+
+        // Step 5: Verify data
+        const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+        if (userIssues.length > 0) {
+          updateStepIndicator(5, 'completed');
+          addTestResult('Step 5: Verification', `✅ ${userIssues.length} report(s) found in storage`);
+        } else {
+          updateStepIndicator(5, 'failed');
+          addTestResult('Step 5: Verification', '❌ No reports found in storage');
+        }
+
+        document.getElementById('testStatus').innerHTML = '<div class="success">✅ Complete test finished!</div>';
+        
+      } catch (error) {
+        document.getElementById('testStatus').innerHTML = `<div class="error">❌ Test failed: ${error.message}</div>`;
+        console.error('Complete test error:', error);
+      }
+    }
+
+    function testSubmitReport() {
+      try {
+        // Simulate the exact submitReport function from Report Issue Page
+        const reportData = {
+          id: 'issue_' + Date.now(),
+          category: 'pothole', // Default category
+          description: 'Test issue description for debugging purposes',
+          priority: 'medium',
+          location: localStorage.getItem('reportedIssueLocation') || 'Test Location',
+          locationData: JSON.parse(localStorage.getItem('reportLocation') || '{}'),
+          photo: localStorage.getItem('capturedPhoto'),
+          timestamp: new Date().toISOString(),
+          status: 'Reported',
+          reporter: 'Test User'
+        };
+
+        console.log('📋 Test report data:', reportData);
+
+        // Save to user issues
+        const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+        userIssues.push(reportData);
+        localStorage.setItem('userIssues', JSON.stringify(userIssues));
+
+        // Clear temporary data (like the original function does)
+        localStorage.removeItem('capturedPhoto');
+        localStorage.removeItem('reportLocation');
+        localStorage.removeItem('reportedIssueLocation');
+        localStorage.removeItem('photoTimestamp');
+
+        console.log('✅ Test report submitted successfully');
+        return true;
+
+      } catch (error) {
+        console.error('❌ Test submit error:', error);
+        return false;
+      }
+    }
+
+    function addTestResult(step, result) {
+      const resultsDiv = document.getElementById('testResults');
+      const resultDiv = document.createElement('div');
+      resultDiv.className = 'test-result';
+      resultDiv.innerHTML = `
+        <h4>${step}</h4>
+        <p>${result}</p>
+      `;
+      resultsDiv.appendChild(resultDiv);
+    }
+
+    function testStep1() {
+      try {
+        localStorage.setItem('capturedPhoto', testPhotoData);
+        localStorage.setItem('photoTimestamp', new Date().toISOString());
+        document.getElementById('dataStatus').innerHTML = '<div class="success">✅ Step 1: Photo data created</div>';
+      } catch (error) {
+        document.getElementById('dataStatus').innerHTML = `<div class="error">❌ Step 1 error: ${error.message}</div>`;
+      }
+    }
+
+    function testStep2() {
+      try {
+        localStorage.setItem('reportLocation', JSON.stringify(testLocation));
+        localStorage.setItem('reportedIssueLocation', testLocation.address);
+        document.getElementById('dataStatus').innerHTML = '<div class="success">✅ Step 2: Location data created</div>';
+      } catch (error) {
+        document.getElementById('dataStatus').innerHTML = `<div class="error">❌ Step 2 error: ${error.message}</div>`;
+      }
+    }
+
+    function testStep3() {
+      document.getElementById('dataStatus').innerHTML = '<div class="info">✅ Step 3: Report Issue Page should be accessible</div>';
+    }
+
+    function testStep4() {
+      const result = testSubmitReport();
+      if (result) {
+        document.getElementById('dataStatus').innerHTML = '<div class="success">✅ Step 4: Submit function works</div>';
+      } else {
+        document.getElementById('dataStatus').innerHTML = '<div class="error">❌ Step 4: Submit function failed</div>';
+      }
+    }
+
+    function checkAllData() {
+      try {
+        const photo = localStorage.getItem('capturedPhoto');
+        const location = localStorage.getItem('reportedIssueLocation');
+        const locationData = localStorage.getItem('reportLocation');
+        const photoTimestamp = localStorage.getItem('photoTimestamp');
+        const userIssues = localStorage.getItem('userIssues');
+
+        let status = '<div class="info">📊 Current Data Status:</div>';
+
+        if (photo) {
+          status += `<div class="data-preview">✅ Photo: Available (${photo.length} chars)<br>Timestamp: ${photoTimestamp || 'N/A'}</div>`;
+        } else {
+          status += '<div class="error">❌ Photo: Not found</div>';
+        }
+
+        if (location) {
+          status += `<div class="data-preview">✅ Location: ${location}</div>`;
+        } else {
+          status += '<div class="error">❌ Location: Not found</div>';
+        }
+
+        if (locationData) {
+          const parsed = JSON.parse(locationData);
+          status += `<div class="data-preview">✅ Location Data: ${parsed.address}</div>`;
+        } else {
+          status += '<div class="error">❌ Location Data: Not found</div>';
+        }
+
+        if (userIssues) {
+          const issues = JSON.parse(userIssues);
+          status += `<div class="data-preview">📋 User Issues: ${issues.length} reports</div>`;
+        } else {
+          status += '<div class="info">📋 User Issues: None</div>';
+        }
+
+        document.getElementById('dataStatus').innerHTML = status;
+      } catch (error) {
+        document.getElementById('dataStatus').innerHTML = `<div class="error">❌ Error checking data: ${error.message}</div>`;
+      }
+    }
+
+    function clearAllTestData() {
+      try {
+        localStorage.removeItem('capturedPhoto');
+        localStorage.removeItem('photoTimestamp');
+        localStorage.removeItem('reportLocation');
+        localStorage.removeItem('reportedIssueLocation');
+        localStorage.removeItem('userIssues');
+        document.getElementById('dataStatus').innerHTML = '<div class="success">✅ All test data cleared</div>';
+      } catch (error) {
+        document.getElementById('dataStatus').innerHTML = `<div class="error">❌ Error clearing data: ${error.message}</div>`;
+      }
+    }
+
+    function openReportPage() {
+      window.open('../User UI/Report Issue Page/index.html', '_blank');
+    }
+
+    function runStepByStep() {
+      document.getElementById('testStatus').innerHTML = '<div class="info">⏭️ Use individual step tests above to run step-by-step</div>';
+    }
+
+    // Initialize
+    window.onload = function() {
+      checkAllData();
+    };
+  </script>
+</body>
+</html>

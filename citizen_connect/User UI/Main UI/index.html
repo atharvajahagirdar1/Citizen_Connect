@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-translate="home">User Dashboard - Improved</title>
+  <script src="../js/languageManager.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: #f8fafb;
+      color: #1a1a1a;
+      padding-bottom: 80px; /* Space for bottom nav */
+    }
+
+    .container {
+      max-width: 430px;
+      margin: 0 auto;
+      background: white;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 50px 20px 30px 20px;
+      background: white;
+    }
+
+    .user-section {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+
+    .user-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      font-size: 20px;
+      color: white;
+      font-weight: 600;
+      border: 3px solid #f0f7ff;
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .greeting-text {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 2px;
+    }
+
+    .user-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 2px;
+    }
+
+    .user-role {
+      font-size: 12px;
+      color: #4285f4;
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .refresh-button {
+      width: 40px;
+      height: 40px;
+      background: #28a745;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      font-size: 18px;
+      box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+    }
+
+    .refresh-button:hover {
+      background: #218838;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+    }
+
+    .refresh-button:active {
+      transform: scale(0.95);
+    }
+
+    .notification-section {
+      position: relative;
+    }
+
+    .notification-bell {
+      width: 40px;
+      height: 40px;
+      background: #ffc107;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      font-size: 18px;
+      box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+    }
+
+    .notification-bell:hover {
+      background: #fff3cd;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #dc3545;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid white;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      padding: 20px 20px 30px 20px;
+      margin-bottom: 30px;
+    }
+
+    .hero-button {
+      width: 100%;
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+      border: none;
+      padding: 20px 32px;
+      border-radius: 20px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(79, 172, 254, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .hero-button:hover {
+      background: #fff3cd;
+      color: #333;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .hero-icon {
+      font-size: 20px;
+    }
+
+    /* Shortcuts Section */
+    .shortcuts-section {
+      padding: 0 20px;
+      margin-bottom: 30px;
+    }
+
+    .shortcuts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .shortcut-item {
+      background: white;
+      padding: 25px 15px;
+      border-radius: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      border: 2px solid transparent;
+    }
+
+    .shortcut-item:hover {
+      background: #fff3cd;
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      border-color: #ffc107;
+    }
+
+    .shortcut-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 15px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      transition: all 0.3s ease;
+    }
+
+    .shortcut-item:hover .shortcut-icon {
+      transform: scale(1.1);
+    }
+
+    .shortcut-icon.report { 
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    }
+    .shortcut-icon.issues { 
+      background: linear-gradient(135deg, #4ecdc4, #44a08d);
+      box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+    }
+    .shortcut-icon.map { 
+      background: linear-gradient(135deg, #45b7d1, #3498db);
+      box-shadow: 0 4px 15px rgba(69, 183, 209, 0.3);
+    }
+
+    .shortcut-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    /* Recent Issues Section */
+    .recent-issues {
+      padding: 0 20px;
+      margin-bottom: 100px;
+    }
+
+    .section-header {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #1a1a1a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-icon {
+      font-size: 20px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .empty-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+    }
+
+    .empty-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .empty-subtitle {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .empty-action {
+      background: #4285f4;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .empty-action:hover {
+      background: #fff3cd;
+      color: #333;
+      transform: translateY(-2px);
+    }
+
+    /* Issue Items - Enhanced */
+    .issue-item {
+      display: flex;
+      align-items: center;
+      background: white;
+      padding: 16px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+      transition: all 0.3s ease;
+      border: 1px solid #f0f0f0;
+      cursor: pointer;
+      gap: 12px;
+    }
+
+    .issue-item:hover {
+      background: #fff3cd;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+      border-color: #ffc107;
+    }
+
+    .issue-image {
+      flex-shrink: 0;
+    }
+
+    .issue-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      object-fit: cover;
+      background: #f0f0f0;
+    }
+
+    .issue-placeholder {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .issue-icon {
+      font-size: 24px;
+    }
+
+    .issue-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .issue-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .issue-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a1a;
+      line-height: 1.3;
+      word-break: break-word;
+      flex: 1;
+    }
+
+    .issue-time {
+      font-size: 12px;
+      color: #666;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .issue-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .issue-status {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .issue-category {
+      font-size: 11px;
+      color: #666;
+      background: #f8f9fa;
+      padding: 3px 8px;
+      border-radius: 8px;
+    }
+
+    .issue-location {
+      font-size: 11px;
+      color: #666;
+    }
+
+    .issue-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .issue-likes {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      color: #666;
+      background: #f8f9fa;
+      padding: 4px 8px;
+      border-radius: 12px;
+    }
+
+    .like-icon {
+      font-size: 14px;
+    }
+
+    .issue-priority {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .priority-high {
+      background: rgba(220, 53, 69, 0.1);
+    }
+
+    .priority-medium {
+      background: rgba(255, 193, 7, 0.1);
+    }
+
+    .priority-low {
+      background: rgba(40, 167, 69, 0.1);
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      background: white;
+      border-top: 1px solid #e0e0e0;
+      padding: 12px 0 20px 0;
+      box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    .nav-items {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 8px 12px;
+      border-radius: 12px;
+      min-width: 60px;
+    }
+
+    .nav-item:hover {
+      background: #fff3cd;
+      transform: translateY(-2px);
+    }
+
+    .nav-item.active {
+      background: #4285f4;
+      color: white;
+    }
+
+    .nav-item.active:hover {
+      background: #3367d6;
+    }
+
+    .nav-icon {
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+
+    .nav-label {
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 430px) {
+      .container {
+        max-width: 100%;
+      }
+      
+      .bottom-nav {
+        max-width: 100%;
+      }
+      
+      .header {
+        padding: 40px 15px 25px 15px;
+      }
+      
+      .shortcuts-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+      }
+      
+      .shortcut-item {
+        padding: 20px 10px;
+      }
+      
+      .shortcut-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+      }
+      
+      .shortcut-title {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="user-section">
+        <div class="user-avatar" id="userAvatar">C</div>
+        <div class="user-info">
+          <div class="greeting-text" id="greetingText">Good evening,</div>
+          <div class="user-name" id="userName">Citizen User</div>
+          <div class="user-role" id="userRole">Community Member</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="refresh-button" onclick="refreshUserData()" title="Refresh Profile">
+          🔄
+        </button>
+        <div class="notification-section">
+          <button class="notification-bell" onclick="showNotifications()">
+            🔔
+          </button>
+          <span class="notification-badge">3</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero-section">
+      <button class="hero-button" onclick="startReporting()">
+        <span class="hero-icon">🚨</span>
+        <span data-translate="reportIssue">Report an Issue</span>
+      </button>
+    </div>
+
+    <!-- Shortcuts -->
+    <div class="shortcuts-section">
+      <div class="shortcuts-grid">
+        <div class="shortcut-item" onclick="startReporting()">
+          <div class="shortcut-icon report">📷</div>
+          <p class="shortcut-title">Report Issue</p>
+        </div>
+        <div class="shortcut-item" onclick="viewMyIssues()">
+          <div class="shortcut-icon issues">📋</div>
+          <p class="shortcut-title">My Issues</p>
+        </div>
+        <div class="shortcut-item" onclick="exploreMap()">
+          <div class="shortcut-icon map">🗺️</div>
+          <p class="shortcut-title">Explore Map</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Issues -->
+    <div class="recent-issues">
+      <h2 class="section-header">
+        <span class="section-icon">📍</span>
+        My Recent Issues
+      </h2>
+      
+      <div class="empty-state" id="recentIssuesContent">
+        <div class="empty-icon">📋</div>
+        <div class="empty-title">No issues reported yet.</div>
+        <div class="empty-subtitle">Start making a difference in your community by reporting your first civic issue.</div>
+        <button class="empty-action" onclick="startReporting()">Report your first issue</button>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-items">
+        <div class="nav-item active" onclick="goToHome()">
+          <div class="nav-icon">🏠</div>
+          <div class="nav-label">Home</div>
+        </div>
+        <div class="nav-item" onclick="startReporting()">
+          <div class="nav-icon">📷</div>
+          <div class="nav-label">Report</div>
+        </div>
+        <div class="nav-item" onclick="viewMyIssues()">
+          <div class="nav-icon">📋</div>
+          <div class="nav-label">My Issues</div>
+        </div>
+        <div class="nav-item" onclick="exploreMap()">
+          <div class="nav-icon">🗺️</div>
+          <div class="nav-label">Map</div>
+        </div>
+        <div class="nav-item" onclick="showProfile()">
+          <div class="nav-icon">👤</div>
+          <div class="nav-label">Profile</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check authentication and redirect if needed
+    function checkAuth() {
+      const userData = localStorage.getItem('userData');
+      const userProfile = localStorage.getItem('userProfile');
+      
+      console.log('=== Auth Check Debug ===');
+      console.log('userData:', userData);
+      console.log('userProfile:', userProfile);
+      
+      if (!userData && !userProfile) {
+        // No user data found, redirect to login
+        console.log('No user data found, redirecting to login');
+        window.location.href = '../Login and SignUp Page/index.html';
+        return false;
+      }
+      
+      // User data exists, load profile
+      if (userProfile) {
+        try {
+          const profile = JSON.parse(userProfile);
+          console.log('Profile setupCompleted:', profile.setupCompleted);
+          if (!profile.setupCompleted) {
+            // Profile setup not completed, redirect to setup
+            console.log('Profile setup not completed, redirecting to setup');
+            window.location.href = '../SetUp Profile Page/index.html';
+            return false;
+          }
+        } catch (error) {
+          console.error('Error parsing userProfile:', error);
+        }
+      }
+      
+      console.log('Auth check passed, proceeding to load profile');
+      return true;
+    }
+
+    function viewMyIssues() {
+      window.location.href = '../My Issues Page/index.html';
+    }
+
+    function exploreMap() {
+      window.location.href = '../Explore Map Page/index.html';
+    }
+
+    function showNotifications() {
+      window.location.href = '../Notifications Page/index.html';
+    }
+
+    // Update notification badge count
+    function updateNotificationBadge() {
+      const unreadCount = localStorage.getItem('unreadNotificationCount') || '3';
+      const badge = document.querySelector('.notification-badge');
+      
+      if (badge) {
+        if (parseInt(unreadCount) > 0) {
+          badge.textContent = unreadCount;
+          badge.style.display = 'flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    }
+
+    // Add notification for new issue reports
+    function addIssueNotification(issueType) {
+      const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+      
+      const newNotification = {
+        id: Date.now().toString(),
+        type: 'update',
+        title: 'Issue Reported Successfully',
+        message: `Your ${issueType} report has been submitted and is being reviewed by the municipal team.`,
+        time: new Date(),
+        read: false,
+        icon: '📋',
+        priority: 'medium'
+      };
+      
+      notifications.unshift(newNotification);
+      localStorage.setItem('notifications', JSON.stringify(notifications));
+      
+      // Update badge count
+      const unreadCount = notifications.filter(n => !n.read).length;
+      localStorage.setItem('unreadNotificationCount', unreadCount.toString());
+      updateNotificationBadge();
+    }
+
+    // Dynamic greeting based on time
+    function updateGreeting() {
+      const hour = new Date().getHours();
+      const greetingEl = document.querySelector('.greeting-text');
+      
+      if (!greetingEl) return;
+      
+      // Use language manager if available, otherwise use default text
+      if (typeof window.languageManager !== 'undefined') {
+        if (hour < 12) {
+          greetingEl.textContent = languageManager.t('goodMorning');
+        } else if (hour < 17) {
+          greetingEl.textContent = languageManager.t('goodAfternoon');
+        } else {
+          greetingEl.textContent = languageManager.t('goodEvening');
+        }
+      } else {
+        // Fallback to default text if language manager not available
+        if (hour < 12) {
+          greetingEl.textContent = 'Good morning,';
+        } else if (hour < 17) {
+          greetingEl.textContent = 'Good afternoon,';
+        } else {
+          greetingEl.textContent = 'Good evening,';
+        }
+      }
+    }
+
+    // Refresh user data function
+    function refreshUserData() {
+      console.log('🔄 Manual refresh triggered by user');
+      
+      // Add visual feedback - rotate animation
+      const refreshBtn = document.querySelector('.refresh-button');
+      if (refreshBtn) {
+        refreshBtn.style.transform = 'rotate(360deg)';
+        refreshBtn.style.transition = 'transform 0.5s ease';
+        
+        setTimeout(() => {
+          refreshBtn.style.transform = 'rotate(0deg)';
+        }, 500);
+      }
+      
+      // Show loading state
+      const nameEl = document.querySelector('.user-name');
+      const roleEl = document.querySelector('.user-role');
+      if (nameEl) nameEl.textContent = 'Refreshing...';
+      if (roleEl) roleEl.textContent = 'Please wait...';
+      
+      // Force reload profile data
+      setTimeout(() => {
+        debugUserData();
+        loadUserProfile();
+        
+        // Check if data was loaded successfully
+        setTimeout(() => {
+          const currentName = document.querySelector('.user-name')?.textContent;
+          if (currentName === 'Refreshing...' || currentName === 'Citizen User') {
+            console.log('Refresh didn\'t load data, trying force refresh...');
+            forceRefreshProfile();
+          }
+        }, 1000);
+        
+      }, 300);
+    }
+
+    // Enhanced auto-refresh system
+    function startAutoRefreshSystem() {
+      console.log('Starting enhanced auto-refresh system...');
+      
+      // Check if profile needs loading
+      function needsProfileRefresh() {
+        const nameEl = document.querySelector('.user-name');
+        const roleEl = document.querySelector('.user-role');
+        const currentName = nameEl?.textContent || '';
+        const currentRole = roleEl?.textContent || '';
+        
+        const isDefaultName = currentName === 'Citizen User' || currentName === 'Loading...' || currentName === '';
+        const isDefaultRole = currentRole === 'Community Member' || currentRole === 'Loading...' || currentRole === '';
+        
+        return isDefaultName || isDefaultRole;
+      }
+      
+      // More aggressive auto-refresh function
+      function performAutoRefresh() {
+        if (needsProfileRefresh()) {
+          console.log('🔄 Auto-refreshing profile data...');
+          debugUserData();
+          const result = loadUserProfile();
+          
+          // If still not loaded, try force refresh
+          if (!result || !result.profileFound) {
+            setTimeout(() => {
+              forceRefreshProfile();
+            }, 100);
+          }
+          
+          return true; // Continue checking
+        }
+        return false; // Stop checking
+      }
+      
+      // Immediate and frequent checks
+      let checkCount = 0;
+      const maxChecks = 60; // Stop after 5 minutes (60 * 5 seconds)
+      
+      const intensiveInterval = setInterval(() => {
+        checkCount++;
+        console.log(`Auto-refresh check ${checkCount}/${maxChecks}`);
+        
+        const shouldContinue = performAutoRefresh();
+        
+        if (!shouldContinue || checkCount >= maxChecks) {
+          clearInterval(intensiveInterval);
+          console.log('Stopping intensive auto-refresh');
+          
+          // Start less frequent monitoring
+          if (shouldContinue) {
+            startBackgroundMonitoring();
+          }
+        }
+      }, 2000); // Check every 2 seconds initially
+      
+      return intensiveInterval;
+    }
+    
+    // Background monitoring for later
+    function startBackgroundMonitoring() {
+      console.log('Starting background monitoring...');
+      
+      const backgroundInterval = setInterval(() => {
+        const nameEl = document.querySelector('.user-name');
+        if (nameEl && (nameEl.textContent === 'Citizen User' || nameEl.textContent === 'Loading...')) {
+          console.log('Background refresh triggered');
+          loadUserProfile();
+        }
+      }, 10000); // Check every 10 seconds in background
+      
+      return backgroundInterval;
+    }
+
+    // Debug function to check localStorage data
+    function debugUserData() {
+      console.log('=== DEBUGGING USER DATA ===');
+      const allKeys = Object.keys(localStorage);
+      console.log('All localStorage keys:', allKeys);
+      
+      const userProfile = localStorage.getItem('userProfile');
+      const userData = localStorage.getItem('userData');
+      
+      console.log('Raw userProfile data:', userProfile);
+      console.log('Raw userData data:', userData);
+      
+      if (userProfile) {
+        try {
+          const parsedProfile = JSON.parse(userProfile);
+          console.log('Parsed userProfile:', parsedProfile);
+          console.log('Profile fields available:', Object.keys(parsedProfile));
+        } catch (e) {
+          console.error('Error parsing userProfile:', e);
+        }
+      }
+      
+      if (userData) {
+        try {
+          const parsedUser = JSON.parse(userData);
+          console.log('Parsed userData:', parsedUser);
+          console.log('User fields available:', Object.keys(parsedUser));
+        } catch (e) {
+          console.error('Error parsing userData:', e);
+        }
+      }
+      
+      console.log('=== END DEBUG ===');
+    }
+
+    // Force refresh user profile data
+    function forceRefreshProfile() {
+      console.log('=== Force Refreshing Profile ===');
+      
+      // Clear any cached profile elements
+      const userNameEl = document.querySelector('.user-name');
+      const userRoleEl = document.querySelector('.user-role');
+      const avatarEl = document.querySelector('.user-avatar');
+      
+      // Reset to defaults first
+      if (userNameEl) userNameEl.textContent = 'Loading...';
+      if (userRoleEl) userRoleEl.textContent = 'Loading...';
+      if (avatarEl) avatarEl.textContent = '...';
+      
+      // Force reload after a brief moment
+      setTimeout(() => {
+        loadUserProfile();
+      }, 50);
+    }
+
+    // Load user profile data
+    function loadUserProfile() {
+      try {
+        const profileData = localStorage.getItem('userProfile');
+        const userData = localStorage.getItem('userData');
+        
+        console.log('=== Loading User Profile Debug ===');
+        console.log('Raw profileData:', profileData);
+        console.log('Raw userData:', userData);
+        
+        // Set default values
+        let displayName = 'Citizen User';
+        let displayRole = 'Community Member';
+        let profileInitial = 'C';
+        let profileImage = null;
+        let profileFound = false;
+        
+        // Try to load from userProfile first (most complete data)
+        if (profileData && profileData !== 'null' && profileData !== 'undefined') {
+          try {
+            const profile = JSON.parse(profileData);
+            console.log('Parsed profile data:', profile);
+            
+            // Update display name - try multiple field names in order of preference
+            const nameFields = [
+              'fullName', 'name', 'displayName', 'userName', 'username',
+              () => profile.firstName && profile.lastName ? `${profile.firstName} ${profile.lastName}` : null,
+              'firstName', 'lastName'
+            ];
+            
+            for (let field of nameFields) {
+              if (typeof field === 'function') {
+                const computed = field();
+                if (computed && computed.trim()) {
+                  displayName = computed.trim();
+                  profileFound = true;
+                  break;
+                }
+              } else if (profile[field] && profile[field].trim()) {
+                displayName = profile[field].trim();
+                profileFound = true;
+                break;
+              }
+            }
+            
+            if (profileFound) {
+              profileInitial = displayName.charAt(0).toUpperCase();
+            }
+            
+            // Update display role with proper display names
+            if (profile.role && profile.role.trim()) {
+              const roleDisplayNames = {
+                'citizen': 'Citizen',
+                'volunteer': 'Volunteer', 
+                'worker': 'Municipal Worker',
+                'municipal_worker': 'Municipal Worker',
+                'community_member': 'Community Member',
+                'admin': 'Administrator',
+                'user': 'User'
+              };
+              const normalizedRole = profile.role.toLowerCase().trim();
+              displayRole = roleDisplayNames[normalizedRole] || 
+                          profile.role.charAt(0).toUpperCase() + profile.role.slice(1).toLowerCase() || 
+                          'Community Member';
+            }
+            
+            // Store profile image
+            if (profile.profileImage && profile.profileImage.trim()) {
+              profileImage = profile.profileImage;
+            } else if (profile.avatar && profile.avatar.trim()) {
+              profileImage = profile.avatar;
+            }
+            
+            // Apply language preference if available
+            if (profile.language && typeof window.languageManager !== 'undefined') {
+              try {
+                window.languageManager.setLanguage(profile.language);
+                console.log('Applied language preference:', profile.language);
+              } catch (error) {
+                console.error('Error applying language preference:', error);
+              }
+            }
+          } catch (parseError) {
+            console.error('Error parsing profile data:', parseError);
+          }
+        }
+        
+        // Fallback to userData if profileData didn't provide complete info
+        if (userData && userData !== 'null' && userData !== 'undefined' && (!profileFound || displayName === 'Citizen User')) {
+          try {
+            const user = JSON.parse(userData);
+            console.log('Parsed user data:', user);
+            
+            // Try various name fields in order of preference
+            const userNameFields = [
+              'fullName', 'name', 'displayName', 'userName', 'username',
+              () => user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : null,
+              'firstName', 'lastName',
+              () => user.email ? user.email.split('@')[0].charAt(0).toUpperCase() + user.email.split('@')[0].slice(1) : null
+            ];
+            
+            for (let field of userNameFields) {
+              if (typeof field === 'function') {
+                const computed = field();
+                if (computed && computed.trim()) {
+                  displayName = computed.trim();
+                  profileFound = true;
+                  break;
+                }
+              } else if (user[field] && user[field].trim()) {
+                displayName = user[field].trim();
+                profileFound = true;
+                break;
+              }
+            }
+            
+            if (profileFound) {
+              profileInitial = displayName.charAt(0).toUpperCase();
+            }
+            
+            // Update role if available and not already set properly
+            if (user.role && user.role.trim() && (displayRole === 'Community Member' || !displayRole)) {
+              const roleDisplayNames = {
+                'citizen': 'Citizen',
+                'volunteer': 'Volunteer',
+                'worker': 'Municipal Worker',
+                'municipal_worker': 'Municipal Worker',
+                'community_member': 'Community Member',
+                'admin': 'Administrator',
+                'user': 'User'
+              };
+              const normalizedRole = user.role.toLowerCase().trim();
+              displayRole = roleDisplayNames[normalizedRole] || 
+                           user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase() || 
+                           'Community Member';
+            }
+            
+            // Use profile image from userData if not found in profile
+            if (!profileImage && user.profileImage && user.profileImage.trim()) {
+              profileImage = user.profileImage;
+            } else if (!profileImage && user.avatar && user.avatar.trim()) {
+              profileImage = user.avatar;
+            }
+          } catch (parseError) {
+            console.error('Error parsing user data:', parseError);
+          }
+        }
+        
+        console.log('Final values:', { displayName, displayRole, profileInitial, profileImage, profileFound });
+        
+        // Update DOM elements with consistent data
+        const userNameEl = document.querySelector('.user-name');
+        if (userNameEl) {
+          userNameEl.textContent = displayName;
+          console.log('✅ Updated main UI name to:', displayName);
+        } else {
+          console.error('❌ Could not find .user-name element');
+        }
+        
+        const userRoleEl = document.querySelector('.user-role');
+        if (userRoleEl) {
+          userRoleEl.textContent = displayRole;
+          console.log('✅ Updated main UI role to:', displayRole);
+        } else {
+          console.error('❌ Could not find .user-role element');
+        }
+        
+        const avatarEl = document.querySelector('.user-avatar');
+        if (avatarEl) {
+          if (profileImage && profileImage.startsWith('data:image/')) {
+            avatarEl.innerHTML = `<img src="${profileImage}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="Profile">`;
+            console.log('✅ Updated avatar with image');
+          } else {
+            avatarEl.textContent = profileInitial;
+            console.log('✅ Updated avatar with initial:', profileInitial);
+          }
+        } else {
+          console.error('❌ Could not find .user-avatar element');
+        }
+        
+        // Force a visual refresh
+        const header = document.querySelector('.header');
+        if (header) {
+          header.style.opacity = '0.98';
+          setTimeout(() => {
+            header.style.opacity = '1';
+          }, 10);
+        }
+        
+        console.log('=== Profile Loading Complete ===');
+        
+        return { displayName, displayRole, profileInitial, profileFound };
+        
+      } catch (error) {
+        console.error('Error loading user profile in Main UI:', error);
+        // Set fallback values on error
+        const userNameEl = document.querySelector('.user-name');
+        if (userNameEl) {
+          userNameEl.textContent = 'Citizen User';
+        }
+        
+        const userRoleEl = document.querySelector('.user-role');
+        if (userRoleEl) {
+          userRoleEl.textContent = 'Community Member';
+        }
+        
+        const avatarEl = document.querySelector('.user-avatar');
+        if (avatarEl) {
+          avatarEl.textContent = 'C';
+        }
+        
+        return { displayName: 'Citizen User', displayRole: 'Community Member', profileInitial: 'C', profileFound: false };
+      }
+    }
+
+    // Load and display recent issues
+    function loadRecentIssues() {
+      const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+      const recentIssuesContent = document.getElementById('recentIssuesContent');
+      
+      console.log('Loading recent issues:', userIssues);
+      
+      if (userIssues.length > 0) {
+        // Show recent issues (last 5, most recent first)
+        const recentIssues = userIssues.slice(-5).reverse();
+        
+        recentIssuesContent.innerHTML = recentIssues.map((issue, index) => {
+          const timeAgo = getTimeAgo(issue.timestamp || issue.reportedAt || Date.now());
+          const statusClass = getStatusClass(issue.status || 'Reported');
+          const statusIcon = getStatusIcon(issue.status || 'Reported');
+          const truncatedDescription = truncateText(issue.description || issue.title || 'Issue reported', 60);
+          
+          return `
+            <div class="issue-item" onclick="viewIssueDetails('${issue.id}')" data-issue-id="${issue.id}">
+              <div class="issue-image">
+                ${issue.image && issue.image.startsWith('data:image/') ? 
+                  `<img src="${issue.image}" alt="Issue" class="issue-avatar" style="object-fit: cover;">` :
+                  `<div class="issue-avatar issue-placeholder">
+                    <span class="issue-icon">${getCategoryIcon(issue.category || issue.type)}</span>
+                  </div>`
+                }
+              </div>
+              <div class="issue-content">
+                <div class="issue-header">
+                  <div class="issue-title">${truncatedDescription}</div>
+                  <div class="issue-time">${timeAgo}</div>
+                </div>
+                <div class="issue-meta">
+                  <span class="issue-status ${statusClass}">
+                    ${statusIcon} ${issue.status || 'Reported'}
+                  </span>
+                  <span class="issue-category">${issue.category || issue.type || 'General'}</span>
+                  ${issue.location ? `<span class="issue-location">📍 ${truncateText(issue.location, 30)}</span>` : ''}
+                </div>
+              </div>
+              <div class="issue-actions">
+                <div class="issue-likes">
+                  <span class="like-icon">👍</span>
+                  <span class="like-count">${issue.likes || Math.floor(Math.random() * 5) + 1}</span>
+                </div>
+                <div class="issue-priority ${getPriorityClass(issue.priority)}">
+                  ${getPriorityIcon(issue.priority)}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        // Show empty state
+        recentIssuesContent.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <div class="empty-title">No issues reported yet.</div>
+            <div class="empty-subtitle">Start making a difference in your community by reporting your first civic issue.</div>
+            <button class="empty-action" onclick="startReporting()">Report your first issue</button>
+          </div>
+        `;
+      }
+    }
+    
+    // Utility functions for issue display
+    function getTimeAgo(timestamp) {
+      const now = new Date();
+      const issueTime = new Date(timestamp);
+      const diffMs = now - issueTime;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+      
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return `${diffMins}m ago`;
+      if (diffHours < 24) return `${diffHours}h ago`;
+      if (diffDays < 7) return `${diffDays}d ago`;
+      return issueTime.toLocaleDateString();
+    }
+    
+    function getStatusClass(status) {
+      switch(status.toLowerCase()) {
+        case 'resolved': case 'completed': return 'status-resolved';
+        case 'in progress': case 'investigating': case 'in-progress': return 'status-progress';
+        case 'reported': case 'pending': case 'new': return 'status-reported';
+        default: return 'status-reported';
+      }
+    }
+    
+    function getCategoryIcon(category) {
+      const icons = {
+        'road': '🛣️',
+        'water': '💧',
+        'electricity': '⚡',
+        'waste': '🗑️',
+        'public-safety': '🚨',
+        'infrastructure': '🏗️',
+        'traffic': '🚦',
+        'environment': '🌱',
+        'noise': '🔊',
+        'lighting': '💡',
+        'general': '📝',
+        'other': '❓'
+      };
+      return icons[category?.toLowerCase()] || icons['general'];
+    }
+    
+    function getPriorityClass(priority) {
+      switch(priority?.toLowerCase()) {
+        case 'high': case 'urgent': return 'priority-high';
+        case 'medium': return 'priority-medium';
+        case 'low': return 'priority-low';
+        default: return 'priority-medium';
+      }
+    }
+    
+    function getPriorityIcon(priority) {
+      switch(priority?.toLowerCase()) {
+        case 'high': case 'urgent': return '🔴';
+        case 'medium': return '🟡';
+        case 'low': return '🟢';
+        default: return '🟡';
+      }
+    }
+    
+    function truncateText(text, maxLength) {
+      if (!text) return '';
+      return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+    }
+
+    function getStatusIcon(status) {
+      switch(status) {
+        case 'Reported': return '🔴';
+        case 'In Progress': return '🟡';
+        case 'Resolved': return '🟢';
+        default: return '🔴';
+      }
+    }
+
+    function viewIssueDetails(issueId) {
+      console.log('Viewing issue details for:', issueId);
+      
+      // Store the selected issue ID for the details page
+      localStorage.setItem('selectedIssueId', issueId);
+      
+      // Navigate to issue details or My Issues page
+      window.location.href = '../My Issues Page/index.html';
+    }
+    
+    // Auto-refresh issues when new ones are added
+    function refreshIssuesDisplay() {
+      console.log('Refreshing issues display...');
+      loadRecentIssues();
+      
+      // Update notification badge if there are new issues
+      const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+      const recentIssuesCount = userIssues.filter(issue => {
+        const issueTime = new Date(issue.timestamp || issue.reportedAt || 0);
+        const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        return issueTime > dayAgo;
+      }).length;
+      
+      // Add notification for recent issues
+      if (recentIssuesCount > 0) {
+        const currentCount = parseInt(localStorage.getItem('unreadNotificationCount') || '0');
+        localStorage.setItem('unreadNotificationCount', (currentCount + recentIssuesCount).toString());
+        updateNotificationBadge();
+      }
+    }
+
+    // Navigation functions
+    function startReporting() {
+      console.log('startReporting function called');
+      try {
+        window.location.href = '../Capture Photo Page/index.html';
+      } catch (error) {
+        console.error('Error navigating to Capture Photo Page:', error);
+        alert('Error starting the reporting process. Please try again.');
+      }
+    }
+
+    function goToHome() {
+      // Already on home page
+      updateActiveNav('home');
+    }
+
+    function showProfile() {
+      window.location.href = '../Profile Page/index.html';
+    }
+
+    function updateActiveNav(activeItem) {
+      // Remove active class from all nav items
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Add active class to clicked item
+      if (activeItem === 'home') {
+        document.querySelector('.nav-item:first-child').classList.add('active');
+      }
+    }
+
+    // Add click handlers for navigation
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Main UI - DOM Content Loaded');
+      
+      // Check authentication first
+      if (!checkAuth()) {
+        return; // Redirect will happen in checkAuth
+      }
+      
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach((item, index) => {
+        item.addEventListener('click', function() {
+          // Remove active from all
+          navItems.forEach(nav => nav.classList.remove('active'));
+          // Add active to clicked
+          this.classList.add('active');
+        });
+      });
+      
+      // Initialize page
+      updateGreeting();
+      
+      // Debug user data first to see what's actually stored
+      debugUserData();
+      
+      // Load user profile immediately and with multiple attempts
+      console.log('=== Main UI Initialization ===');
+      
+      // First attempt - immediate
+      const profileResult = loadUserProfile();
+      
+      // Start the enhanced auto-refresh system
+      startAutoRefreshSystem();
+      
+      // Enhanced profile loading with immediate retry
+      setTimeout(() => {
+        console.log('Enhanced profile loading check...');
+        const nameEl = document.querySelector('.user-name');
+        const currentName = nameEl ? nameEl.textContent : '';
+        console.log('Current name display:', currentName);
+        
+        if (currentName === 'Citizen User' || currentName === 'Loading...' || currentName === '') {
+          console.log('Profile not loaded properly, attempting enhanced load...');
+          debugUserData();
+          
+          // Try to manually extract and display user data
+          const profileData = localStorage.getItem('userProfile');
+          const userData = localStorage.getItem('userData');
+          
+          if (profileData) {
+            try {
+              const profile = JSON.parse(profileData);
+              if (profile.fullName) {
+                if (nameEl) nameEl.textContent = profile.fullName;
+                console.log('Manually set name from profile:', profile.fullName);
+              }
+            } catch (e) {
+              console.error('Manual profile extraction failed:', e);
+            }
+          } else if (userData) {
+            try {
+              const user = JSON.parse(userData);
+              if (user.name || user.fullName) {
+                const name = user.name || user.fullName;
+                if (nameEl) nameEl.textContent = name;
+                console.log('Manually set name from userData:', name);
+              }
+            } catch (e) {
+              console.error('Manual user data extraction failed:', e);
+            }
+          }
+        }
+      }, 100);
+      
+      // Second attempt - after DOM is fully ready
+      setTimeout(() => {
+        console.log('Second profile load attempt...');
+        debugUserData();
+        const secondResult = loadUserProfile();
+        if (!secondResult || !secondResult.profileFound) {
+          console.log('Profile still not found, forcing refresh...');
+          forceRefreshProfile();
+        }
+      }, 500);
+      
+      // Third attempt - final fallback
+      setTimeout(() => {
+        const finalCheck = document.querySelector('.user-name');
+        if (finalCheck && (finalCheck.textContent === 'Citizen User' || finalCheck.textContent === 'Loading...' || finalCheck.textContent === '')) {
+          console.log('Final attempt to load profile...');
+          debugUserData();
+          forceRefreshProfile();
+        }
+      }, 2000);
+      
+      // Additional periodic checks
+      setTimeout(() => {
+        console.log('Additional check at 5 seconds...');
+        const nameEl = document.querySelector('.user-name');
+        if (nameEl && (nameEl.textContent === 'Citizen User' || nameEl.textContent === 'Loading...' || nameEl.textContent === '')) {
+          loadUserProfile();
+        }
+      }, 5000);
+      
+      setTimeout(() => {
+        console.log('Additional check at 10 seconds...');
+        const nameEl = document.querySelector('.user-name');
+        if (nameEl && (nameEl.textContent === 'Citizen User' || nameEl.textContent === 'Loading...' || nameEl.textContent === '')) {
+          loadUserProfile();
+        }
+      }, 10000);
+      
+      loadRecentIssues();
+      updateNotificationBadge();
+      
+      // Refresh issues periodically to show real-time updates
+      setInterval(() => {
+        refreshIssuesDisplay();
+      }, 30000); // Refresh every 30 seconds
+      
+      // Listen for storage changes to update profile in real-time
+      window.addEventListener('storage', function(e) {
+        if (e.key === 'userProfile' || e.key === 'userData') {
+          console.log('💾 Storage changed, auto-reloading profile:', e.key);
+          setTimeout(() => {
+            debugUserData();
+            loadUserProfile();
+          }, 50);
+        }
+        
+        // Listen for new issues being added
+        if (e.key === 'userIssues') {
+          console.log('📋 Issues updated, refreshing display');
+          setTimeout(() => {
+            refreshIssuesDisplay();
+          }, 100);
+        }
+      });
+      
+      // Override localStorage setItem to detect same-page changes
+      const originalSetItem = localStorage.setItem;
+      localStorage.setItem = function(key, value) {
+        originalSetItem.apply(this, arguments);
+        if (key === 'userProfile' || key === 'userData') {
+          console.log('💾 Same-page storage change detected:', key);
+          setTimeout(() => {
+            debugUserData();
+            loadUserProfile();
+          }, 50);
+        }
+        
+        // Auto-refresh issues when they're updated
+        if (key === 'userIssues') {
+          console.log('📋 Same-page issues update detected');
+          setTimeout(() => {
+            refreshIssuesDisplay();
+          }, 100);
+        }
+      };
+      
+      // Also listen for custom events from other pages
+      window.addEventListener('profileUpdated', function(e) {
+        console.log('🔔 Profile updated event received, auto-reloading');
+        setTimeout(() => {
+          debugUserData();
+          loadUserProfile();
+        }, 50);
+      });
+      
+      // Listen for focus events to refresh profile when user returns to page
+      window.addEventListener('focus', function() {
+        console.log('👁️ Window focused, auto-checking profile...');
+        setTimeout(() => {
+          const nameEl = document.querySelector('.user-name');
+          if (nameEl && (nameEl.textContent === 'Citizen User' || nameEl.textContent === 'Loading...' || nameEl.textContent === '')) {
+            console.log('Profile needs refresh on focus');
+            debugUserData();
+            loadUserProfile();
+          }
+        }, 100);
+      });
+      
+      // Listen for page visibility changes
+      document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+          console.log('👀 Page became visible, auto-checking profile...');
+          setTimeout(() => {
+            const nameEl = document.querySelector('.user-name');
+            if (nameEl && (nameEl.textContent === 'Citizen User' || nameEl.textContent === 'Loading...' || nameEl.textContent === '')) {
+              console.log('Profile needs refresh on visibility change');
+              debugUserData();
+              loadUserProfile();
+            }
+          }, 200);
+        }
+      });
+      
+      // Debug: Log current localStorage data
+      console.log('=== Main UI Debug Info ===');
+      console.log('userProfile:', localStorage.getItem('userProfile'));
+      console.log('userData:', localStorage.getItem('userData'));
+      console.log('=========================');
+      
+      // Initialize language system
+      if (typeof window.languageManager !== 'undefined') {
+        try {
+          window.languageManager.updatePageTranslations();
+          console.log('Language manager initialized in Main UI');
+        } catch (error) {
+          console.error('Error with language manager:', error);
+        }
+      } else {
+        console.warn('Language manager not available in Main UI');
+      }
+      
+      // Check for new notifications periodically
+      setInterval(updateNotificationBadge, 30000); // Check every 30 seconds
+    });
+  </script>
+</body>
+</html>

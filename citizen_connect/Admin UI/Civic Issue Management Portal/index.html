@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Civic Issue Management Portal - Citizen Connect</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation Header -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <button class="back-button" onclick="goBack()">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <i class="fas fa-city"></i>
+        <span>Citizen Connect - Admin</span>
+      </div>
+      <div class="nav-menu">
+        <a href="#dashboard" class="nav-link active" data-tab="dashboard">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="#issues" class="nav-link" data-tab="issues">
+          <i class="fas fa-exclamation-triangle"></i> Issues
+        </a>
+        <a href="#analytics" class="nav-link" data-tab="analytics">
+          <i class="fas fa-chart-bar"></i> Analytics
+        </a>
+        <a href="#workers" class="nav-link" data-tab="workers">
+          <i class="fas fa-users"></i> Workers
+        </a>
+        <a href="#settings" class="nav-link" data-tab="settings">
+          <i class="fas fa-cog"></i> Settings
+        </a>
+      </div>
+      <div class="nav-profile">
+        <div class="admin-badge">
+          <i class="fas fa-shield-alt"></i>
+          <span>Admin</span>
+        </div>
+        <button class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Dashboard Tab -->
+    <div id="dashboard" class="tab-content active">
+      <div class="page-header">
+        <h1>Civic Issue Management Dashboard</h1>
+        <p>Monitor and manage civic issues across your city</p>
+      </div>
+
+      <!-- Key Metrics -->
+      <div class="metrics-grid">
+        <div class="metric-card critical">
+          <div class="metric-icon">
+            <i class="fas fa-exclamation-circle"></i>
+          </div>
+          <div class="metric-content">
+            <h3 id="criticalIssues">12</h3>
+            <p>Critical Issues</p>
+            <span class="metric-change positive">+2 from yesterday</span>
+          </div>
+        </div>
+
+        <div class="metric-card pending">
+          <div class="metric-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="metric-content">
+            <h3 id="pendingIssues">45</h3>
+            <p>Pending Issues</p>
+            <span class="metric-change neutral">5 days avg</span>
+          </div>
+        </div>
+
+        <div class="metric-card in-progress">
+          <div class="metric-icon">
+            <i class="fas fa-tools"></i>
+          </div>
+          <div class="metric-content">
+            <h3 id="inProgressIssues">28</h3>
+            <p>In Progress</p>
+            <span class="metric-change positive">-3 this week</span>
+          </div>
+        </div>
+
+        <div class="metric-card resolved">
+          <div class="metric-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="metric-content">
+            <h3 id="resolvedIssues">156</h3>
+            <p>Resolved This Month</p>
+            <span class="metric-change positive">+24% vs last month</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="action-buttons">
+          <button class="action-btn btn-primary" onclick="showCreateIssueModal()">
+            <i class="fas fa-plus"></i>
+            Create New Issue
+          </button>
+          <button class="action-btn btn-secondary" onclick="exportReports()">
+            <i class="fas fa-download"></i>
+            Export Reports
+          </button>
+          <button class="action-btn btn-info" onclick="sendNotification()">
+            <i class="fas fa-bell"></i>
+            Send Notification
+          </button>
+          <button class="action-btn btn-warning" onclick="bulkAssign()">
+            <i class="fas fa-user-plus"></i>
+            Bulk Assign
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="recent-activity">
+        <h2>Recent Activity</h2>
+        <div class="activity-list" id="recentActivityList">
+          <!-- Activity items will be populated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Issues Tab -->
+    <div id="issues" class="tab-content">
+      <div class="page-header">
+        <h1>Manage Civic Issues</h1>
+        <p>Review, assign, and track all reported issues</p>
+      </div>
+
+      <!-- Filters and Search -->
+      <div class="filters-section">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="issueSearch" placeholder="Search issues by ID, description, or location...">
+        </div>
+        <div class="filter-group">
+          <select id="statusFilter" class="filter-select">
+            <option value="">All Status</option>
+            <option value="reported">Reported</option>
+            <option value="verified">Verified</option>
+            <option value="assigned">Assigned</option>
+            <option value="in-progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+            <option value="closed">Closed</option>
+          </select>
+          <select id="priorityFilter" class="filter-select">
+            <option value="">All Priorities</option>
+            <option value="critical">Critical</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+          <select id="categoryFilter" class="filter-select">
+            <option value="">All Categories</option>
+            <option value="infrastructure">Infrastructure</option>
+            <option value="sanitation">Sanitation</option>
+            <option value="traffic">Traffic</option>
+            <option value="environment">Environment</option>
+            <option value="public-safety">Public Safety</option>
+          </select>
+        </div>
+        <button class="filter-btn" onclick="applyFilters()">
+          <i class="fas fa-filter"></i>
+          Apply Filters
+        </button>
+      </div>
+
+      <!-- Issues Table -->
+      <div class="issues-table-container">
+        <div class="table-header">
+          <div class="table-row">
+            <div class="col-issue">Issue</div>
+            <div class="col-category">Category</div>
+            <div class="col-priority">Priority</div>
+            <div class="col-status">Status</div>
+            <div class="col-assigned">Assigned To</div>
+            <div class="col-date">Reported Date</div>
+            <div class="col-actions">Actions</div>
+          </div>
+        </div>
+        <div class="issues-table" id="issuesTable">
+          <!-- Issues will be populated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics Tab -->
+    <div id="analytics" class="tab-content">
+      <div class="page-header">
+        <h1>Analytics & Reports</h1>
+        <p>Data-driven insights for better civic management</p>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Issues by Category</h3>
+          <canvas id="categoryChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Resolution Time Trends</h3>
+          <canvas id="resolutionChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Monthly Issue Volume</h3>
+          <canvas id="volumeChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Worker Performance</h3>
+          <canvas id="performanceChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="stats-section">
+        <div class="stat-card">
+          <h4>Average Resolution Time</h4>
+          <p class="stat-value">3.2 days</p>
+          <span class="stat-trend positive">↓ 15% from last month</span>
+        </div>
+        <div class="stat-card">
+          <h4>Issue Resolution Rate</h4>
+          <p class="stat-value">87%</p>
+          <span class="stat-trend positive">↑ 5% from last month</span>
+        </div>
+        <div class="stat-card">
+          <h4>Most Active Category</h4>
+          <p class="stat-value">Infrastructure</p>
+          <span class="stat-trend">42% of all issues</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workers Tab -->
+    <div id="workers" class="tab-content">
+      <div class="page-header">
+        <h1>Worker Management</h1>
+        <p>Manage field workers and volunteers</p>
+      </div>
+
+      <div class="workers-controls">
+        <button class="action-btn btn-primary" onclick="addWorker()">
+          <i class="fas fa-user-plus"></i>
+          Add Worker
+        </button>
+        <button class="action-btn btn-secondary" onclick="assignWorkers()">
+          <i class="fas fa-tasks"></i>
+          Auto Assign
+        </button>
+      </div>
+
+      <div class="workers-table" id="workersTable">
+        <!-- Workers list will be populated here -->
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div id="settings" class="tab-content">
+      <div class="page-header">
+        <h1>Portal Settings</h1>
+        <p>Configure your civic issue management system</p>
+      </div>
+
+      <div class="settings-grid">
+        <div class="settings-card">
+          <h3>Notification Settings</h3>
+          <div class="setting-item">
+            <label class="switch">
+              <input type="checkbox" id="emailNotifications" checked>
+              <span class="slider"></span>
+            </label>
+            <span>Email notifications for critical issues</span>
+          </div>
+          <div class="setting-item">
+            <label class="switch">
+              <input type="checkbox" id="smsNotifications">
+              <span class="slider"></span>
+            </label>
+            <span>SMS notifications for urgent issues</span>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h3>Auto Assignment Rules</h3>
+          <div class="setting-item">
+            <label>Maximum issues per worker:</label>
+            <input type="number" value="5" min="1" max="10">
+          </div>
+          <div class="setting-item">
+            <label>Assignment radius (km):</label>
+            <input type="number" value="5" min="1" max="50">
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Issue Detail Modal -->
+  <div id="issueModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalIssueTitle">Issue Details</h2>
+        <span class="close">&times;</span>
+      </div>
+      <div class="modal-body" id="modalIssueContent">
+        <!-- Issue details will be populated here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Issue Modal -->
+  <div id="createIssueModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Create New Issue</h2>
+        <span class="close">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="createIssueForm">
+          <div class="form-group">
+            <label>Issue Title</label>
+            <input type="text" id="issueTitle" required>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="issueDescription" rows="3" required></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category</label>
+              <select id="issueCategory" required>
+                <option value="">Select Category</option>
+                <option value="infrastructure">Infrastructure</option>
+                <option value="sanitation">Sanitation</option>
+                <option value="traffic">Traffic</option>
+                <option value="environment">Environment</option>
+                <option value="public-safety">Public Safety</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Priority</label>
+              <select id="issuePriority" required>
+                <option value="">Select Priority</option>
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="issueLocation" required>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create Issue</button>
+            <button type="button" class="btn btn-secondary" onclick="closeCreateIssueModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // Session management
+    document.addEventListener('DOMContentLoaded', function() {
+      checkAuthentication();
+      
+      // Add logout functionality
+      const logoutBtn = document.querySelector('.logout-btn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+          if (confirm('Are you sure you want to logout?')) {
+            // Remove the isLoggedIn flag but keep other data
+            const adminData = localStorage.getItem('adminData');
+            if (adminData) {
+              const admin = JSON.parse(adminData);
+              admin.isLoggedIn = false;
+              localStorage.setItem('adminData', JSON.stringify(admin));
+            }
+            window.location.href = '../Login/index.html';
+          }
+        });
+      }
+    });
+
+    function checkAuthentication() {
+      const adminData = localStorage.getItem('adminData');
+      if (!adminData) {
+        window.location.href = '../Login/index.html';
+        return;
+      }
+      
+      // Parse the admin data and check if user is logged in
+      const admin = JSON.parse(adminData);
+      if (!admin.isLoggedIn) {
+        window.location.href = '../Login/index.html';
+        return;
+      }
+      
+      // Update admin info in header
+      const adminBadge = document.querySelector('.admin-badge span');
+      if (adminBadge && admin.name) {
+        adminBadge.textContent = admin.name;
+      }
+    }
+
+    // Back button functionality
+    function goBack() {
+      window.history.back();
+    }
+  </script>
+</body>
+</html>

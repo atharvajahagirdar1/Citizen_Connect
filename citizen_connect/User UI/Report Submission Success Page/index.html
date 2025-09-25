@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Submitted - Citizen Connect</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: #f8fafb;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: white;
+      width: 100%;
+      max-width: 400px;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 30px;
+      animation: bounce 0.6s ease-out;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-10px);
+      }
+      60% {
+        transform: translateY(-5px);
+      }
+    }
+
+    .success-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 16px;
+    }
+
+    .success-description {
+      font-size: 16px;
+      color: #6b7280;
+      line-height: 1.5;
+      margin-bottom: 30px;
+    }
+
+    /* Issue details */
+    .issue-details {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+    
+    .issue-detail-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .issue-detail-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    
+    .detail-label {
+      color: #6b7280;
+      font-weight: 500;
+    }
+    
+    .detail-value {
+      font-weight: 600;
+      color: #1a1a1a;
+      text-align: right;
+      max-width: 200px;
+      word-wrap: break-word;
+    }
+    
+    /* Timeline styles */
+    .timeline {
+      margin-top: 30px;
+      padding-left: 20px;
+      position: relative;
+    }
+    
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e0e0e0;
+    }
+    
+    .timeline-item {
+      position: relative;
+      padding-left: 30px;
+      margin-bottom: 20px;
+    }
+    
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      border: 3px solid white;
+      box-shadow: 0 0 0 2px #e0e0e0;
+    }
+    
+    .timeline-item.completed::before {
+      background: #28a745;
+      box-shadow: 0 0 0 2px #28a745;
+    }
+    
+    .timeline-title {
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+    
+    .timeline-date {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    /* Action buttons */
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .action-button {
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .action-button.primary {
+      background: #4285f4;
+      color: white;
+      box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+    }
+
+    .action-button.primary:hover {
+      background: #fff3cd;
+      color: #333;
+      transform: translateY(-2px);
+    }
+
+    .action-button.secondary {
+      background: transparent;
+      color: #6b7280;
+      border: 2px solid #e5e7eb;
+    }
+
+    .action-button.secondary:hover {
+      background: #fff3cd;
+      border-color: #ffc107;
+      color: #333;
+      transform: translateY(-1px);
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .container {
+        margin: 20px;
+        padding: 30px 25px;
+      }
+      
+      .detail-value {
+        max-width: 150px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="success-icon">✅</div>
+    <h1 class="success-title">Issue Reported Successfully!</h1>
+    <p class="success-description">
+      Thank you for making a difference in your community. Your report has been submitted 
+      and the municipal team has been notified. Below are the details of your report:
+    </p>
+    
+    <div class="issue-details" id="issueDetails">
+      <div class="issue-detail-item">
+        <div class="detail-label">Category</div>
+        <div class="detail-value" id="issueCategory">Loading...</div>
+      </div>
+      <div class="issue-detail-item">
+        <div class="detail-label">Location</div>
+        <div class="detail-value" id="issueLocation">Loading...</div>
+      </div>
+      <div class="issue-detail-item">
+        <div class="detail-label">Priority</div>
+        <div class="detail-value" id="issuePriority">Loading...</div>
+      </div>
+      <div class="issue-detail-item">
+        <div class="detail-label">Description</div>
+        <div class="detail-value" id="issueDescription">Loading...</div>
+      </div>
+    </div>
+    
+    <div class="timeline">
+      <div class="timeline-item completed">
+        <div class="timeline-title">Report Submitted</div>
+        <div class="timeline-date" id="submitDate">Just now</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-title">Under Review</div>
+        <div class="timeline-date">Estimated within 24 hours</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-title">Resolution</div>
+        <div class="timeline-date" id="resolutionDate">Estimated within 7 days</div>
+      </div>
+    </div>
+    
+    <div class="action-buttons">
+      <button class="action-button primary" onclick="goHome()">
+        🏠 Return to Dashboard
+      </button>
+      <button class="action-button secondary" onclick="viewMyIssues()">
+        📋 View My Reports
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Load issue details from localStorage
+    function loadIssueDetails() {
+      try {
+        // Get the last submitted issue
+        const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+        
+        if (userIssues.length > 0) {
+          const latestIssue = userIssues[userIssues.length - 1];
+          
+          // Update issue details
+          const categoryMap = {
+            'pothole': '🕳️ Potholes & Road Damage',
+            'streetlight': '💡 Street Lighting',
+            'garbage': '🗑️ Garbage & Waste',
+            'water': '💧 Water & Drainage',
+            'traffic': '🚦 Traffic & Signals',
+            'sidewalk': '🚶 Sidewalks & Walkways',
+            'park': '🌳 Parks & Recreation',
+            'noise': '🔊 Noise Pollution',
+            'other': '📝 Other'
+          };
+          
+          const priorityMap = {
+            'low': '🟢 Low',
+            'medium': '🟡 Medium',
+            'high': '🔴 High',
+            'urgent': '🚨 Urgent'
+          };
+          
+          document.getElementById('issueCategory').textContent = 
+            categoryMap[latestIssue.category] || latestIssue.category;
+          document.getElementById('issueLocation').textContent = latestIssue.location;
+          document.getElementById('issuePriority').textContent = 
+            priorityMap[latestIssue.priority] || latestIssue.priority;
+          
+          // Truncate description if too long
+          const description = latestIssue.description;
+          const truncatedDescription = description.length > 50 ? 
+            description.substring(0, 50) + '...' : description;
+          document.getElementById('issueDescription').textContent = truncatedDescription;
+          
+          // Format submit date
+          const submitDate = new Date(latestIssue.timestamp);
+          document.getElementById('submitDate').textContent = 
+            submitDate.toLocaleString();
+          
+          // Set resolution date (7 days from submission)
+          const resolutionDate = new Date(submitDate);
+          resolutionDate.setDate(resolutionDate.getDate() + 7);
+          document.getElementById('resolutionDate').textContent = 
+            'Estimated by ' + resolutionDate.toLocaleDateString();
+            
+          console.log('Issue details loaded:', latestIssue);
+        } else {
+          // Fallback data if no issues found
+          document.getElementById('issueCategory').textContent = 'General Issue';
+          document.getElementById('issueLocation').textContent = 'Location not specified';
+          document.getElementById('issuePriority').textContent = 'Medium';
+          document.getElementById('issueDescription').textContent = 'Issue reported successfully';
+        }
+      } catch (error) {
+        console.error('Error loading issue details:', error);
+        // Set fallback values on error
+        document.getElementById('issueCategory').textContent = 'General Issue';
+        document.getElementById('issueLocation').textContent = 'Location not specified';
+        document.getElementById('issuePriority').textContent = 'Medium';
+        document.getElementById('issueDescription').textContent = 'Issue reported successfully';
+      }
+    }
+    
+    // Navigate to home dashboard
+    function goHome() {
+      window.location.href = '../Main UI/index.html';
+    }
+    
+    // Navigate to my issues page
+    function viewMyIssues() {
+      window.location.href = '../My Issues Page/index.html';
+    }
+    
+    // Add notification for successful submission
+    function addSuccessNotification() {
+      try {
+        const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+        
+        const newNotification = {
+          id: Date.now().toString(),
+          type: 'update',
+          title: 'Issue Reported Successfully',
+          message: 'Your civic issue report has been submitted and is being reviewed by the municipal team. You will be notified of any updates.',
+          time: new Date(),
+          read: false,
+          icon: '📋',
+          priority: 'medium'
+        };
+        
+        notifications.unshift(newNotification);
+        localStorage.setItem('notifications', JSON.stringify(notifications));
+        
+        // Update badge count
+        const unreadCount = notifications.filter(n => !n.read).length;
+        localStorage.setItem('unreadNotificationCount', unreadCount.toString());
+        
+        console.log('Success notification added');
+      } catch (error) {
+        console.error('Error adding notification:', error);
+      }
+    }
+    
+    // Initialize page
+    window.onload = function() {
+      console.log('Report Submission Success Page loaded');
+      
+      // Load issue details
+      loadIssueDetails();
+      
+      // Add success notification
+      addSuccessNotification();
+      
+      // Auto-redirect after 15 seconds
+      setTimeout(() => {
+        console.log('Auto-redirecting to dashboard...');
+        goHome();
+      }, 15000);
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capture Photo - Citizen Connect</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: #000;
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .container {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: #000;
+    }
+
+    /* Header */
+    .header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      padding: 50px 20px 20px 20px;
+      background: rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .back-btn:hover {
+      background: #fff3cd;
+      color: #333;
+      transform: scale(1.1);
+    }
+
+    .step-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      flex: 1;
+      text-align: center;
+    }
+
+    .header-spacer {
+      width: 40px;
+    }
+
+    /* Camera preview section */
+    .camera-preview {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    video, canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .camera-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      font-size: 48px;
+    }
+
+    .placeholder-text {
+      font-size: 16px;
+      margin-top: 15px;
+      text-align: center;
+      opacity: 0.7;
+      color: #ccc;
+    }
+
+    /* Bottom controls - iOS style */
+    .camera-controls {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* Top row controls */
+    .control-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: 10px;
+    }
+
+    .control-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      font-size: 20px;
+      color: #fff;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .control-btn:hover {
+      background: #fff3cd;
+      color: #333;
+      transform: scale(1.1);
+    }
+
+    .control-btn.active {
+      background: #ffc107;
+      color: #000;
+    }
+
+    /* Center shutter button - iOS style */
+    .shutter-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      margin: 10px 0;
+    }
+
+    .shutter-btn {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #fff;
+      border: 6px solid rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .shutter-btn:hover {
+      background: #fff3cd;
+      border-color: #ffc107;
+      transform: scale(1.05);
+    }
+
+    .shutter-btn:active {
+      transform: scale(0.95);
+    }
+
+    .shutter-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .shutter-btn::after {
+      content: '';
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #fff;
+      position: absolute;
+      transition: all 0.2s ease;
+    }
+
+    .shutter-btn:active::after {
+      width: 50px;
+      height: 50px;
+    }
+
+    /* Upload option */
+    .upload-option {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(10px);
+      text-decoration: none;
+    }
+
+    .upload-option:hover {
+      background: #fff3cd;
+      border-color: #ffc107;
+      color: #333;
+      transform: translateY(-2px);
+    }
+
+    /* Hidden elements */
+    .hidden {
+      display: none;
+    }
+
+    /* Action buttons - shown after capture */
+    .action-buttons {
+      display: none;
+      position: absolute;
+      bottom: 30px;
+      left: 20px;
+      right: 20px;
+      gap: 12px;
+      flex-direction: column;
+      z-index: 11;
+    }
+
+    .action-buttons.show {
+      display: flex;
+    }
+
+    .action-btn {
+      padding: 16px;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-primary {
+      background: rgba(255, 255, 255, 0.9);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: #fff3cd;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 243, 205, 0.9);
+      color: #333;
+      border-color: #ffc107;
+      transform: translateY(-1px);
+    }
+
+    /* Success state overlay */
+    .capture-success {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(40, 167, 69, 0.1);
+      border: 3px solid #28a745;
+      z-index: 5;
+      pointer-events: none;
+      animation: captureFlash 0.3s ease-out;
+    }
+
+    @keyframes captureFlash {
+      0% {
+        background: rgba(255, 255, 255, 0.8);
+      }
+      100% {
+        background: rgba(40, 167, 69, 0.1);
+      }
+    }
+
+    /* Flash effect */
+    .flash-effect {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #fff;
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .flash-effect.active {
+      animation: flashAnimation 0.1s ease-out;
+    }
+
+    @keyframes flashAnimation {
+      0% {
+        opacity: 0;
+      }
+      50% {
+        opacity: 0.8;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    /* Permission Button Styles */
+    .permission-btn {
+      background: #4285f4;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+    }
+
+    .permission-btn:hover {
+      background: #fff3cd;
+      color: #333;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .permission-denied {
+      color: #dc3545;
+      text-align: center;
+      padding: 20px;
+      background: rgba(220, 53, 69, 0.1);
+      border-radius: 12px;
+      margin: 20px;
+    }
+
+    .permission-denied h3 {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .permission-denied p {
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 430px) {
+      .header {
+        padding: 40px 15px 15px 15px;
+      }
+      
+      .camera-controls {
+        padding: 25px 15px;
+      }
+      
+      .shutter-btn {
+        width: 70px;
+        height: 70px;
+      }
+      
+      .shutter-btn::after {
+        width: 50px;
+        height: 50px;
+      }
+      
+      .control-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+      }
+      
+      .upload-option {
+        padding: 10px 20px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Flash Effect -->
+    <div class="flash-effect" id="flashEffect"></div>
+
+    <!-- Header -->
+    <div class="header">
+      <button class="back-btn" onclick="goBack()">←</button>
+      <div class="step-title">Step 1: Capture Photo</div>
+      <div class="header-spacer"></div>
+    </div>
+
+    <!-- Camera Preview -->
+    <div class="camera-preview" id="cameraPreview">
+      <div class="camera-placeholder" id="cameraPlaceholder">
+        📷
+        <div class="placeholder-text">Camera is starting...</div>
+        <button class="permission-btn" id="permissionBtn" onclick="requestCameraPermission()" style="display: none;">
+          🔒 Enable Camera
+        </button>
+        <!-- Debug button for troubleshooting -->
+        <button onclick="debugCameraIssue()" style="margin-top: 10px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 8px; font-size: 12px; cursor: pointer;">
+          🔍 Debug Camera Issue
+        </button>
+      </div>
+      <video id="camera" autoplay playsinline class="hidden"></video>
+      <canvas id="snapshot" class="hidden"></canvas>
+    </div>
+
+    <!-- Camera Controls -->
+    <div class="camera-controls">
+      <div class="control-options">
+        <button class="control-btn" onclick="toggleFlash()" id="flashBtn" title="Flash">⚡</button>
+        <div class="shutter-container">
+          <button class="shutter-btn" id="captureBtn" type="button" disabled></button>
+        </div>
+        <button class="control-btn" onclick="switchCamera()" id="switchBtn" title="Switch Camera">🔄</button>
+      </div>
+
+      <label class="upload-option" for="fileInput">
+        Or, Upload from Gallery
+        <input type="file" accept="image/*" id="fileInput" class="hidden" onchange="handleFileUpload(event)">
+      </label>
+    </div>
+
+    <!-- Action Buttons (shown after capture) -->
+    <div class="action-buttons" id="actionButtons">
+      <button class="action-btn btn-primary" onclick="usePhoto()">
+        ✓ Use This Photo
+      </button>
+      <button class="action-btn btn-secondary" onclick="retakePhoto()">
+        🔄 Retake Photo
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let stream = null;
+    let currentFacingMode = 'environment';
+    let flashEnabled = false;
+    let capturedImageData = null;
+    
+    const video = document.getElementById('camera');
+    const canvas = document.getElementById('snapshot');
+    const captureBtn = document.getElementById('captureBtn');
+    const cameraPlaceholder = document.getElementById('cameraPlaceholder');
+    const cameraPreview = document.getElementById('cameraPreview');
+    const actionButtons = document.getElementById('actionButtons');
+    const context = canvas.getContext('2d');
+
+    // Initialize camera with proper permission handling
+    async function initCamera() {
+      console.log('Attempting to initialize camera...');
+      
+      try {
+        // Check if camera is supported
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error('Camera not supported on this device');
+        }
+        
+        // Update placeholder to show loading
+        updatePlaceholder('📷', 'Requesting camera permission...');
+        
+        // Request permission first
+        const permissionStatus = await checkCameraPermission();
+        console.log('Camera permission status:', permissionStatus);
+        
+        if (permissionStatus === 'denied') {
+          throw new Error('Camera permission denied');
+        }
+        
+        const constraints = {
+          video: {
+            facingMode: currentFacingMode,
+            width: { ideal: 1280, min: 640 },
+            height: { ideal: 720, min: 480 }
+          }
+        };
+        
+        console.log('Requesting camera with constraints:', constraints);
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        
+        // Success - setup video stream
+        video.srcObject = stream;
+        
+        // Wait for video to be ready
+        video.onloadedmetadata = function() {
+          console.log('Video metadata loaded, showing camera feed');
+          
+          // Show video, hide placeholder
+          video.classList.remove('hidden');
+          cameraPlaceholder.classList.add('hidden');
+          
+          // Enable capture button
+          captureBtn.disabled = false;
+          
+          // Setup button listeners
+          setupButtonListeners();
+          
+          console.log('Camera initialized successfully');
+        };
+        
+        // Handle video loading errors
+        video.onerror = function(e) {
+          console.error('Video loading error:', e);
+          handleCameraError(new Error('Video stream failed to load'));
+        };
+        
+      } catch (err) {
+        console.error('Camera initialization failed:', err);
+        handleCameraError(err);
+      }
+    }
+    
+    // Check camera permission status
+    async function checkCameraPermission() {
+      try {
+        if (navigator.permissions) {
+          const permission = await navigator.permissions.query({ name: 'camera' });
+          console.log('Permission query result:', permission.state);
+          return permission.state; // 'granted', 'denied', or 'prompt'
+        }
+        return 'unknown';
+      } catch (error) {
+        console.log('Permission query not supported:', error);
+        return 'unknown';
+      }
+    }
+
+    // Stop camera
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      
+      video.classList.add('hidden');
+      cameraPlaceholder.classList.remove('hidden');
+      captureBtn.disabled = true;
+    }
+
+    // Switch between front and back camera with enhanced error handling
+    async function switchCamera() {
+      if (!stream) {
+        console.log('No active camera stream, attempting to start camera first');
+        await initCamera();
+        return;
+      }
+      
+      console.log(`Switching camera from ${currentFacingMode} to ${currentFacingMode === 'user' ? 'environment' : 'user'}`);
+      
+      try {
+        currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+        stopCamera();
+        
+        // Show loading state
+        updatePlaceholder('🔄', 'Switching camera...');
+        
+        await initCamera();
+      } catch (error) {
+        console.error('Camera switch failed:', error);
+        // Try to fallback to original camera
+        currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+        await initCamera();
+      }
+    }
+
+    // Toggle flash (mock implementation)
+    function toggleFlash() {
+      flashEnabled = !flashEnabled;
+      const flashBtn = document.getElementById('flashBtn');
+      
+      if (flashEnabled) {
+        flashBtn.classList.add('active');
+      } else {
+        flashBtn.classList.remove('active');
+      }
+    }
+
+    // Capture photo with enhanced validation and flash effect
+    function capturePhoto() {
+      console.log('Capture button clicked');
+      
+      if (!stream) {
+        console.error('No camera stream available');
+        alert('Camera is not active. Please enable camera access and try again.');
+        // Try to restart camera
+        initCamera();
+        return;
+      }
+      
+      if (!video.videoWidth || !video.videoHeight) {
+        console.error('Video stream not ready');
+        alert('Camera is still loading. Please wait a moment and try again.');
+        return;
+      }
+      
+      // Check if video is actually playing
+      if (video.paused || video.ended) {
+        console.error('Video is not playing');
+        alert('Camera stream interrupted. Please try again.');
+        return;
+      }
+      
+      try {
+        console.log('Capturing photo...');
+        
+        // Flash effect
+        const flashEffect = document.getElementById('flashEffect');
+        if (flashEffect) {
+          flashEffect.classList.add('active');
+          setTimeout(() => {
+            flashEffect.classList.remove('active');
+          }, 100);
+        }
+        
+        // Set canvas size to match video
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        console.log(`Capturing at resolution: ${canvas.width}x${canvas.height}`);
+        
+        // Clear canvas first
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw current video frame to canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Get image data with quality optimization
+        capturedImageData = canvas.toDataURL('image/jpeg', 0.8);
+        
+        if (!capturedImageData || capturedImageData === 'data:,' || capturedImageData.length < 100) {
+          throw new Error('Failed to capture image data');
+        }
+        
+        console.log('Photo captured successfully, size:', capturedImageData.length);
+        
+        // Show captured image
+        canvas.classList.remove('hidden');
+        video.classList.add('hidden');
+        cameraPreview.classList.add('capture-success');
+        
+        // Show action buttons
+        actionButtons.classList.add('show');
+        
+        // Disable capture button during review
+        captureBtn.disabled = true;
+        
+        // Stop camera to save battery
+        stopCamera();
+        
+        console.log('Photo capture completed');
+        
+        // Vibration feedback if available
+        if (navigator.vibrate) {
+          navigator.vibrate(50);
+        }
+        
+      } catch (error) {
+        console.error('Error capturing photo:', error);
+        alert('Error capturing photo. Please try again.');
+        
+        // Try to restart camera on error
+        setTimeout(() => {
+          initCamera();
+        }, 1000);
+      }
+    }
+
+    // Handle file upload
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file.');
+        return;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image file is too large. Please select an image smaller than 5MB.');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        capturedImageData = e.target.result;
+        
+        const img = new Image();
+        img.onload = function() {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          context.drawImage(img, 0, 0);
+          
+          canvas.classList.remove('hidden');
+          video.classList.add('hidden');
+          cameraPlaceholder.classList.add('hidden');
+          cameraPreview.classList.add('capture-success');
+          
+          actionButtons.classList.add('show');
+          
+          console.log('Image uploaded successfully');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Use the captured/uploaded photo
+    function usePhoto() {
+      if (!capturedImageData) {
+        alert('No photo to use. Please capture or upload a photo first.');
+        return;
+      }
+      
+      try {
+        localStorage.setItem('capturedPhoto', capturedImageData);
+        localStorage.setItem('photoTimestamp', new Date().toISOString());
+        
+        console.log('Photo saved to localStorage');
+        window.location.href = '../Location Selection Page/index.html';
+      } catch (error) {
+        console.error('Error saving photo:', error);
+        alert('Error saving photo. Please try again.');
+      }
+    }
+
+    // Retake photo
+    function retakePhoto() {
+      console.log('Retaking photo...');
+      
+      actionButtons.classList.remove('show');
+      canvas.classList.add('hidden');
+      cameraPreview.classList.remove('capture-success');
+      capturedImageData = null;
+      
+      // Re-enable capture button
+      captureBtn.disabled = false;
+      
+      // Restart camera
+      initCamera();
+    }
+    
+    // Add click event listeners for better button interaction
+    function setupButtonListeners() {
+      // Make sure capture button is properly connected
+      const captureButton = document.getElementById('captureBtn');
+      if (captureButton) {
+        // Remove any existing listeners
+        captureButton.removeEventListener('click', capturePhoto);
+        // Add new listener
+        captureButton.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Capture button event triggered');
+          
+          if (!captureButton.disabled) {
+            capturePhoto();
+          } else {
+            console.log('Capture button is disabled');
+          }
+        });
+        
+        // Also handle touch events for mobile
+        captureButton.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Capture button touch event triggered');
+          
+          if (!captureButton.disabled) {
+            capturePhoto();
+          }
+        });
+      }
+      
+      // Setup other button listeners
+      const retakeBtn = document.querySelector('.action-btn.btn-secondary');
+      if (retakeBtn) {
+        retakeBtn.removeEventListener('click', retakePhoto);
+        retakeBtn.addEventListener('click', retakePhoto);
+      }
+      
+      const useBtn = document.querySelector('.action-btn.btn-primary');
+      if (useBtn) {
+        useBtn.removeEventListener('click', usePhoto);
+        useBtn.addEventListener('click', usePhoto);
+      }
+    }
+
+    // Handle camera errors with specific permission handling
+    function handleCameraError(error) {
+      console.error('Camera error details:', error);
+      
+      let errorMessage = '';
+      let showPermissionButton = false;
+      
+      // Clear any existing video stream
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError' || 
+          error.message.includes('permission') || error.message.includes('denied')) {
+        errorMessage = 'Camera permission denied';
+        showPermissionButton = true;
+        updatePlaceholder('🚫', 'Camera access denied', showPermissionButton);
+        showPermissionDeniedMessage();
+      } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+        errorMessage = 'No camera found on this device';
+        updatePlaceholder('❌', 'No camera available');
+        showAlternativeOptions();
+      } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+        errorMessage = 'Camera is already in use by another application';
+        showPermissionButton = true;
+        updatePlaceholder('🚨', 'Camera unavailable - try closing other apps', showPermissionButton);
+      } else if (error.name === 'OverconstrainedError' || error.name === 'ConstraintNotSatisfiedError') {
+        errorMessage = 'Camera settings not supported';
+        updatePlaceholder('⚙️', 'Camera not compatible');
+        // Try with simpler constraints
+        trySimpleCamera();
+      } else {
+        errorMessage = error.message || 'Camera initialization failed';
+        showPermissionButton = true;
+        updatePlaceholder('❌', 'Camera error - tap to retry', showPermissionButton);
+      }
+      
+      console.log('Camera error handled:', errorMessage);
+    }
+    
+    // Try camera with simpler constraints
+    async function trySimpleCamera() {
+      console.log('Trying camera with simple constraints...');
+      
+      try {
+        updatePlaceholder('🔄', 'Trying alternative camera settings...');
+        
+        const simpleConstraints = {
+          video: true // Use default constraints
+        };
+        
+        stream = await navigator.mediaDevices.getUserMedia(simpleConstraints);
+        video.srcObject = stream;
+        
+        video.onloadedmetadata = function() {
+          video.classList.remove('hidden');
+          cameraPlaceholder.classList.add('hidden');
+          captureBtn.disabled = false;
+          
+          // Setup button listeners
+          setupButtonListeners();
+          
+          console.log('Simple camera setup successful');
+        };
+        
+      } catch (fallbackError) {
+        console.error('Simple camera also failed:', fallbackError);
+        updatePlaceholder('❌', 'Camera not working');
+        showAlternativeOptions();
+      }
+    }
+    
+    // Show alternative options when camera fails
+    function showAlternativeOptions() {
+      const uploadOption = document.querySelector('.upload-option');
+      if (uploadOption) {
+        uploadOption.style.background = '#4285f4';
+        uploadOption.style.color = 'white';
+        uploadOption.style.fontSize = '18px';
+        uploadOption.style.padding = '16px 24px';
+        uploadOption.innerHTML = '📁 Upload Photo from Gallery';
+        
+        // Make it more prominent
+        uploadOption.style.animation = 'pulse 2s infinite';
+      }
+      
+      // Add pulse animation
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes pulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+          100% { transform: scale(1); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    // Update placeholder content
+    function updatePlaceholder(icon, text, showButton = false) {
+      const permissionBtn = document.getElementById('permissionBtn');
+      
+      cameraPlaceholder.innerHTML = `
+        <div style="font-size: 48px; margin-bottom: 15px;">${icon}</div>
+        <div class="placeholder-text">${text}</div>
+      `;
+      
+      if (showButton) {
+        cameraPlaceholder.appendChild(permissionBtn);
+        permissionBtn.style.display = 'flex';
+      } else {
+        permissionBtn.style.display = 'none';
+      }
+    }
+    
+    // Show detailed permission denied message
+    function showPermissionDeniedMessage() {
+      const existingMessage = document.querySelector('.permission-denied');
+      if (existingMessage) existingMessage.remove();
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'permission-denied';
+      messageDiv.innerHTML = `
+        <h3>🔒 Camera Permission Required</h3>
+        <p>To report issues with photos, please allow camera access:</p>
+        <p>• Click the camera icon in your browser's address bar</p>
+        <p>• Select "Allow" when prompted for camera permission</p>
+        <p>• Or try the "Enable Camera" button below</p>
+      `;
+      
+      cameraPreview.appendChild(messageDiv);
+    }
+    
+    // Request camera permission manually
+    async function requestCameraPermission() {
+      console.log('🔒 Manual camera permission request triggered');
+      
+      updatePlaceholder('📷', 'Requesting camera permission...');
+      
+      try {
+        // Clear any existing error messages
+        const errorMessage = document.querySelector('.permission-denied');
+        if (errorMessage) errorMessage.remove();
+        
+        // Try force request first
+        await forceRequestCamera();
+        
+      } catch (error) {
+        console.error('❌ Manual permission request failed:', error);
+        
+        // Try the most basic approach
+        try {
+          console.log('🔄 Trying alternative approach...');
+          await tryBasicCamera();
+        } catch (fallbackError) {
+          console.error('❌ All camera attempts failed:', fallbackError);
+          handleCameraError(fallbackError);
+        }
+      }
+    }
+    
+    // Enhanced permission checking on page load
+    async function checkInitialPermissions() {
+      console.log('🔍 Checking initial camera permissions...');
+      
+      try {
+        const permissionStatus = await checkCameraPermission();
+        console.log('📋 Initial permission status:', permissionStatus);
+        
+        if (permissionStatus === 'denied') {
+          updatePlaceholder('🚫', 'Camera permission denied - Click to enable', true);
+          showPermissionDeniedMessage();
+          return false;
+        } else if (permissionStatus === 'granted') {
+          console.log('✅ Permission already granted, starting camera...');
+          await initCamera();
+          return true;
+        } else {
+          // Permission status is 'prompt' or 'unknown' - try to request immediately
+          console.log('❓ Permission status unclear, attempting immediate request...');
+          await forceRequestCamera();
+          return true;
+        }
+      } catch (error) {
+        console.error('❌ Permission check failed:', error);
+        updatePlaceholder('📷', 'Click to enable camera', true);
+        return false;
+      }
+    }
+    
+    // Force camera request with immediate permission prompt
+    async function forceRequestCamera() {
+      console.log('🚀 Force requesting camera access...');
+      
+      try {
+        updatePlaceholder('📷', 'Please allow camera access when prompted...');
+        
+        // Try to get camera access immediately - this will trigger permission prompt
+        const testConstraints = {
+          video: {
+            facingMode: 'environment',
+            width: { ideal: 1280, min: 640 },
+            height: { ideal: 720, min: 480 }
+          }
+        };
+        
+        console.log('📝 Requesting with constraints:', testConstraints);
+        const testStream = await navigator.mediaDevices.getUserMedia(testConstraints);
+        
+        console.log('✅ Camera access granted! Setting up video...');
+        
+        // Use the stream directly instead of stopping and restarting
+        stream = testStream;
+        video.srcObject = stream;
+        
+        video.onloadedmetadata = function() {
+          console.log('📺 Video metadata loaded successfully');
+          video.classList.remove('hidden');
+          cameraPlaceholder.classList.add('hidden');
+          captureBtn.disabled = false;
+          setupButtonListeners();
+          console.log('🎉 Camera setup completed!');
+        };
+        
+        video.onerror = function(e) {
+          console.error('📺 Video error:', e);
+          handleCameraError(new Error('Video stream failed'));
+        };
+        
+      } catch (error) {
+        console.error('🚫 Force camera request failed:', error);
+        
+        if (error.name === 'NotAllowedError') {
+          updatePlaceholder('🚫', 'Camera permission denied - Click to try again', true);
+          showPermissionDeniedMessage();
+        } else {
+          // Try fallback with basic constraints
+          await tryBasicCamera();
+        }
+      }
+    }
+    
+    // Try with most basic camera constraints
+    async function tryBasicCamera() {
+      console.log('🔄 Trying basic camera constraints...');
+      
+      try {
+        updatePlaceholder('🔄', 'Trying basic camera setup...');
+        
+        // Most basic constraints possible
+        const basicStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        
+        console.log('✅ Basic camera access successful!');
+        stream = basicStream;
+        video.srcObject = stream;
+        
+        video.onloadedmetadata = function() {
+          video.classList.remove('hidden');
+          cameraPlaceholder.classList.add('hidden');
+          captureBtn.disabled = false;
+          setupButtonListeners();
+          console.log('📷 Basic camera setup completed!');
+        };
+        
+      } catch (basicError) {
+        console.error('❌ Even basic camera failed:', basicError);
+        handleCameraError(basicError);
+      }
+    }
+
+    // Debug function to help troubleshoot camera issues
+    async function debugCameraIssue() {
+      console.log('🔍=== CAMERA DEBUG REPORT ===');
+      
+      // Basic browser info
+      console.log('🌍 Browser:', navigator.userAgent);
+      console.log('🔒 Protocol:', location.protocol);
+      console.log('🌐 Host:', location.host);
+      
+      // Media devices support
+      console.log('📱 navigator.mediaDevices available:', !!navigator.mediaDevices);
+      console.log('📹 getUserMedia available:', !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia));
+      
+      // Permission status
+      try {
+        if (navigator.permissions) {
+          const permission = await navigator.permissions.query({ name: 'camera' });
+          console.log('🔒 Camera permission:', permission.state);
+        } else {
+          console.log('⚠️ Permissions API not available');
+        }
+      } catch (e) {
+        console.log('❌ Permission query failed:', e);
+      }
+      
+      // Device enumeration
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(d => d.kind === 'videoinput');
+        console.log('📹 Video devices found:', videoDevices.length);
+        videoDevices.forEach((device, index) => {
+          console.log(`  Device ${index + 1}:`, {
+            label: device.label || 'Unknown',
+            deviceId: device.deviceId,
+            groupId: device.groupId
+          });
+        });
+      } catch (e) {
+        console.log('❌ Device enumeration failed:', e);
+      }
+      
+      // Try basic camera access
+      try {
+        console.log('🔄 Testing basic camera access...');
+        const testStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        console.log('✅ Basic camera access successful!');
+        console.log('📺 Video track:', testStream.getVideoTracks()[0]);
+        
+        // Clean up
+        testStream.getTracks().forEach(track => track.stop());
+        
+        // If basic access works, try to initialize properly
+        await forceRequestCamera();
+        
+      } catch (e) {
+        console.log('❌ Basic camera access failed:', e.name, e.message);
+        
+        // Show user-friendly error
+        let userMessage = 'Camera access failed. ';
+        if (e.name === 'NotAllowedError') {
+          userMessage += 'Please allow camera permission when prompted.';
+        } else if (e.name === 'NotFoundError') {
+          userMessage += 'No camera found on this device.';
+        } else if (e.name === 'NotReadableError') {
+          userMessage += 'Camera is being used by another application.';
+        } else {
+          userMessage += 'Unknown error: ' + e.message;
+        }
+        
+        alert(userMessage);
+      }
+      
+      console.log('🔍=== END DEBUG REPORT ===');
+    }
+
+    // Go back to previous page
+    function goBack() {
+      if (stream) {
+        stopCamera();
+      }
+      window.location.href = '../Main UI/index.html';
+    }
+
+    // Initialize page with enhanced error handling
+    document.addEventListener('DOMContentLoaded', async function() {
+      console.log('🎉 Capture Photo Page loaded');
+      console.log('🌍 User Agent:', navigator.userAgent);
+      console.log('🔒 Protocol:', location.protocol);
+      console.log('🌐 Hostname:', location.hostname);
+      
+      // Check browser support with detailed logging
+      if (!navigator.mediaDevices) {
+        console.error('❌ navigator.mediaDevices not available');
+        updatePlaceholder('❌', 'Camera API not supported');
+        showAlternativeOptions();
+        return;
+      }
+      
+      if (!navigator.mediaDevices.getUserMedia) {
+        console.error('❌ getUserMedia not available');
+        updatePlaceholder('❌', 'Camera access not supported');
+        showAlternativeOptions();
+        return;
+      }
+      
+      console.log('✅ Camera API is supported');
+      
+      // Check if we're on HTTPS (required for camera in production)
+      if (location.protocol !== 'https:' && location.hostname !== 'localhost' && 
+          location.hostname !== '127.0.0.1' && location.hostname !== '0.0.0.0') {
+        console.warn('⚠️ Camera requires HTTPS in production');
+        updatePlaceholder('🔒', 'Camera requires secure connection (HTTPS)', true);
+        showAlternativeOptions();
+        return;
+      }
+      
+      console.log('✅ Protocol check passed');
+      
+      // Check device capabilities
+      try {
+        console.log('🔍 Checking available devices...');
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+        console.log('📹 Video devices found:', videoDevices.length);
+        console.log('📋 Device details:', videoDevices.map(d => ({ label: d.label, deviceId: d.deviceId })));
+        
+        if (videoDevices.length === 0) {
+          console.warn('⚠️ No video devices detected');
+          updatePlaceholder('❌', 'No camera detected on this device', true);
+          showAlternativeOptions();
+          return;
+        }
+      } catch (error) {
+        console.warn('⚠️ Could not enumerate devices:', error);
+        // Continue anyway, as this might still work
+      }
+      
+      // Auto-start camera with permission check
+      console.log('🚀 Starting camera initialization...');
+      
+      // Show initial loading state
+      updatePlaceholder('📷', 'Preparing camera...');
+      
+      // Try immediate camera access
+      setTimeout(async () => {
+        try {
+          console.log('🔄 Attempting immediate camera access...');
+          await forceRequestCamera();
+        } catch (error) {
+          console.error('❌ Immediate camera access failed:', error);
+          
+          // Fallback to permission check approach
+          try {
+            console.log('🔄 Trying permission check approach...');
+            const success = await checkInitialPermissions();
+            if (!success) {
+              console.log('⚠️ Permission check failed, showing manual option');
+              updatePlaceholder('📷', 'Click to enable camera', true);
+            }
+          } catch (fallbackError) {
+            console.error('❌ All camera initialization attempts failed:', fallbackError);
+            updatePlaceholder('📷', 'Click to enable camera', true);
+          }
+          
+          // Setup button listeners regardless of camera status
+          setupButtonListeners();
+        }
+      }, 100);
+    });
+
+    // Cleanup when page is unloaded
+    window.addEventListener('beforeunload', function() {
+      if (stream) {
+        stopCamera();
+      }
+    });
+  </script>
+</body>
+</html>

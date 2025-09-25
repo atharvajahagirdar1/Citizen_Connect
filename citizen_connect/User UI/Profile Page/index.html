@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-translate="profile">Profile - Citizen Connect</title>
+  <script src="../js/languageManager.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: #f8fafb;
+      color: #1a1a1a;
+      padding-bottom: 80px;
+    }
+
+    .container {
+      max-width: 430px;
+      margin: 0 auto;
+      background: white;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 50px 20px 30px 20px;
+      background: white;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .back-button {
+      background: #f5f5f5;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-right: 15px;
+      font-size: 18px;
+      transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+      background: #fff3cd;
+      transform: scale(1.05);
+    }
+
+    .header-title {
+      flex: 1;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    .notification-bell {
+      width: 40px;
+      height: 40px;
+      background: #ffc107;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      font-size: 18px;
+      box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+      position: relative;
+    }
+
+    .notification-bell:hover {
+      background: #fff3cd;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #dc3545;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid white;
+    }
+
+    /* Profile Section */
+    .profile-section {
+      padding: 30px 20px;
+      text-align: center;
+      background: white;
+    }
+
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 48px;
+      color: white;
+      font-weight: 600;
+      border: 4px solid #f0f7ff;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .profile-avatar:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .camera-overlay {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      width: 35px;
+      height: 35px;
+      background: #4285f4;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 16px;
+      border: 3px solid white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .camera-overlay:hover {
+      background: #fff3cd;
+      color: #333;
+      transform: scale(1.1);
+    }
+
+    .profile-name {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .profile-role {
+      font-size: 16px;
+      color: #4285f4;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    .profile-stats {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Settings Section */
+    .settings-section {
+      padding: 20px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 20px;
+      padding-left: 5px;
+    }
+
+    .settings-list {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+
+    .setting-item:hover {
+      background: #fff3cd;
+      transform: translateX(3px);
+    }
+
+    .setting-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      font-size: 18px;
+    }
+
+    .setting-icon.profile { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .setting-icon.notifications { background: linear-gradient(135deg, #ffc107, #ff8f00); }
+    .setting-icon.language { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+    .setting-icon.help { background: linear-gradient(135deg, #45b7d1, #3498db); }
+    .setting-icon.about { background: linear-gradient(135deg, #a8e6cf, #56ab2f); }
+    .setting-icon.logout { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+
+    .setting-content {
+      flex: 1;
+    }
+
+    .setting-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+
+    .setting-subtitle {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .setting-arrow {
+      font-size: 16px;
+      color: #9ca3af;
+    }
+
+    /* Account Actions */
+    .account-actions {
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-edit {
+      background: #4285f4;
+      color: white;
+      box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+    }
+
+    .btn-edit:hover {
+      background: #fff3cd;
+      color: #333;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-logout {
+      background: transparent;
+      color: #dc3545;
+      border: 2px solid #dc3545;
+    }
+
+    .btn-logout:hover {
+      background: #fff3cd;
+      color: #333;
+      border-color: #ffc107;
+      transform: translateY(-1px);
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      background: white;
+      border-top: 1px solid #e0e0e0;
+      padding: 12px 0 20px 0;
+      box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    .nav-items {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 8px 12px;
+      border-radius: 12px;
+      min-width: 60px;
+    }
+
+    .nav-item:hover {
+      background: #fff3cd;
+      transform: translateY(-2px);
+    }
+
+    .nav-item.active {
+      background: #4285f4;
+      color: white;
+    }
+
+    .nav-item.active:hover {
+      background: #3367d6;
+    }
+
+    .nav-icon {
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+
+    .nav-label {
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* Hidden File Input */
+    .hidden-input {
+      display: none;
+    }
+
+    /* Language Selection Modal */
+    .language-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .language-modal.show {
+      display: flex;
+    }
+
+    .language-content {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 350px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .language-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .language-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .language-subtitle {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .language-options {
+      margin-bottom: 25px;
+    }
+
+    .language-option {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: white;
+    }
+
+    .language-option:hover {
+      background: #fff3cd;
+      border-color: #ffc107;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+    }
+
+    .language-option.selected {
+      background: #4285f4;
+      border-color: #4285f4;
+      color: white;
+    }
+
+    .language-option.selected:hover {
+      background: #3367d6;
+      border-color: #3367d6;
+    }
+
+    .language-flag {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      font-size: 18px;
+      background: #f0f0f0;
+    }
+
+    .language-info {
+      flex: 1;
+    }
+
+    .language-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .language-native {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .language-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #28a745;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+    }
+
+    .language-option.selected .language-check {
+      display: flex;
+    }
+
+    .language-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .modal-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 100px;
+    }
+
+    .btn-apply {
+      background: #4285f4;
+      color: white;
+    }
+
+    .btn-apply:hover {
+      background: #fff3cd;
+      color: #333;
+      transform: translateY(-2px);
+    }
+
+    .btn-cancel {
+      background: transparent;
+      color: #6b7280;
+      border: 2px solid #e9ecef;
+    }
+
+    .btn-cancel:hover {
+      background: #fff3cd;
+      color: #333;
+      border-color: #ffc107;
+      transform: translateY(-1px);
+    }
+
+    /* Responsive */
+    @media (max-width: 430px) {
+      .container {
+        max-width: 100%;
+      }
+      
+      .bottom-nav {
+        max-width: 100%;
+      }
+      
+      .language-content {
+        padding: 20px;
+        margin: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <button class="back-button" onclick="goBack()">
+        ←
+      </button>
+      <div class="header-title" data-translate="profile">Profile</div>
+      <button class="notification-bell" onclick="showNotifications()">
+        🔔
+        <span class="notification-badge" id="notificationBadge">3</span>
+      </button>
+    </div>
+
+    <!-- Profile Section -->
+    <div class="profile-section">
+      <div class="profile-avatar" onclick="changeProfilePicture()" id="profileAvatar">
+        C
+        <div class="camera-overlay">📷</div>
+      </div>
+      <div class="profile-name" id="profileName">Citizen User</div>
+      <div class="profile-role" id="profileRole">Community Leader</div>
+      
+      <div class="profile-stats">
+        <div class="stat-item">
+          <div class="stat-number" id="issuesReported">0</div>
+          <div class="stat-label" data-translate="issuesReported">Issues Reported</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="issuesResolved">0</div>
+          <div class="stat-label" data-translate="resolved">Resolved</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="communityRank">--</div>
+          <div class="stat-label" data-translate="rank">Rank</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Section -->
+    <div class="settings-section">
+      <h2 class="section-title" data-translate="settings">Settings</h2>
+      <div class="settings-list">
+        <div class="setting-item" onclick="editProfile()">
+          <div class="setting-icon profile">👤</div>
+          <div class="setting-content">
+            <div class="setting-title" data-translate="editProfile">Edit Profile</div>
+            <div class="setting-subtitle" data-translate="updatePersonalInfo">Update your personal information</div>
+          </div>
+          <div class="setting-arrow">›</div>
+        </div>
+        
+        <div class="setting-item" onclick="manageNotifications()">
+          <div class="setting-icon notifications">🔔</div>
+          <div class="setting-content">
+            <div class="setting-title" data-translate="notifications">Notifications</div>
+            <div class="setting-subtitle" data-translate="manageNotificationPrefs">Manage your notification preferences</div>
+          </div>
+          <div class="setting-arrow">›</div>
+        </div>
+        
+        <div class="setting-item" onclick="changeLanguage()">
+          <div class="setting-icon language">🌐</div>
+          <div class="setting-content">
+            <div class="setting-title" data-translate="language">Language</div>
+            <div class="setting-subtitle" data-translate="choosePreferredLanguage">Choose your preferred language</div>
+          </div>
+          <div class="setting-arrow">›</div>
+        </div>
+        
+        <div class="setting-item" onclick="showHelp()">
+          <div class="setting-icon help">❓</div>
+          <div class="setting-content">
+            <div class="setting-title" data-translate="helpSupport">Help & Support</div>
+            <div class="setting-subtitle" data-translate="getHelpContactSupport">Get help and contact support</div>
+          </div>
+          <div class="setting-arrow">›</div>
+        </div>
+        
+        <div class="setting-item" onclick="showAbout()">
+          <div class="setting-icon about">ℹ️</div>
+          <div class="setting-content">
+            <div class="setting-title" data-translate="about">About</div>
+            <div class="setting-subtitle" data-translate="appVersionInfo">App version and information</div>
+          </div>
+          <div class="setting-arrow">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Actions -->
+    <div class="account-actions">
+      <button class="action-btn btn-edit" onclick="editProfile()">
+        ✏️ <span data-translate="editProfile">Edit Profile</span>
+      </button>
+      <button class="action-btn btn-logout" onclick="logout()">
+        🚪 <span data-translate="logout">Logout</span>
+      </button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-items">
+        <div class="nav-item" onclick="goToHome()">
+          <div class="nav-icon">🏠</div>
+          <div class="nav-label" data-translate="home">Home</div>
+        </div>
+        <div class="nav-item" onclick="startReporting()">
+          <div class="nav-icon">📷</div>
+          <div class="nav-label" data-translate="report">Report</div>
+        </div>
+        <div class="nav-item" onclick="viewMyIssues()">
+          <div class="nav-icon">📋</div>
+          <div class="nav-label" data-translate="myIssues">My Issues</div>
+        </div>
+        <div class="nav-item" onclick="exploreMap()">
+          <div class="nav-icon">🗺️</div>
+          <div class="nav-label" data-translate="map">Map</div>
+        </div>
+        <div class="nav-item active" onclick="showProfile()">
+          <div class="nav-icon">👤</div>
+          <div class="nav-label" data-translate="profile">Profile</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden File Input for Profile Picture -->
+    <input type="file" id="profileImageInput" class="hidden-input" accept="image/*" onchange="handleProfileImageChange(event)">
+    
+    <!-- Language Selection Modal -->
+    <div class="language-modal" id="languageModal">
+      <div class="language-content">
+        <div class="language-header">
+          <div class="language-title" data-translate="language">Language</div>
+          <div class="language-subtitle" data-translate="choosePreferredLanguage">Choose your preferred language</div>
+        </div>
+        
+        <div class="language-options" id="languageOptions">
+          <!-- Language options will be populated by JavaScript -->
+        </div>
+        
+        <div class="language-actions">
+          <button class="modal-btn btn-cancel" onclick="closeLanguageModal()" data-translate="cancel">Cancel</button>
+          <button class="modal-btn btn-apply" onclick="applyLanguageChange()" data-translate="save">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Load user profile data
+    function loadUserProfile() {
+      try {
+        const profileData = localStorage.getItem('userProfile');
+        const userData = localStorage.getItem('userData');
+        
+        // Set default values
+        let displayName = 'Citizen User';
+        let displayRole = 'Community Member';
+        let profileInitial = 'C';
+        let profileImage = null;
+        
+        if (profileData) {
+          const profile = JSON.parse(profileData);
+          console.log('Loading profile from userProfile:', profile);
+          
+          // Update display name
+          if (profile.fullName && profile.fullName.trim()) {
+            displayName = profile.fullName.trim();
+            profileInitial = displayName.charAt(0).toUpperCase();
+          }
+          
+          // Update display role with proper display names
+          if (profile.role) {
+            const roleDisplayNames = {
+              'citizen': 'Citizen',
+              'volunteer': 'Volunteer', 
+              'worker': 'Municipal Worker'
+            };
+            displayRole = roleDisplayNames[profile.role] || 'Community Member';
+          }
+          
+          // Store profile image
+          if (profile.profileImage) {
+            profileImage = profile.profileImage;
+          }
+          
+          // Apply saved language preference
+          if (profile.language) {
+            try {
+              if (typeof window.languageManager !== 'undefined') {
+                window.languageManager.setLanguage(profile.language);
+                console.log('Applied saved language preference:', profile.language);
+              } else {
+                localStorage.setItem('selectedLanguage', profile.language);
+              }
+            } catch (error) {
+              console.error('Error applying language preference:', error);
+            }
+          }
+        } else if (userData) {
+          const user = JSON.parse(userData);
+          console.log('Loading profile from userData:', user);
+          
+          // If only basic user data, show name and default role
+          if (user.name && user.name.trim()) {
+            displayName = user.name.trim();
+            profileInitial = displayName.charAt(0).toUpperCase();
+          }
+        }
+        
+        // Update DOM elements with consistent data
+        const profileNameEl = document.getElementById('profileName');
+        if (profileNameEl) {
+          profileNameEl.textContent = displayName;
+          console.log('Updated profile page name to:', displayName);
+        }
+        
+        const profileRoleEl = document.getElementById('profileRole');
+        if (profileRoleEl) {
+          profileRoleEl.textContent = displayRole;
+        }
+        
+        const avatarEl = document.getElementById('profileAvatar');
+        if (avatarEl) {
+          if (profileImage) {
+            avatarEl.innerHTML = `<img src="${profileImage}" alt="Profile"><div class="camera-overlay">📷</div>`;
+          } else {
+            avatarEl.innerHTML = `${profileInitial}<div class="camera-overlay">📷</div>`;
+          }
+        }
+        
+        // Load user statistics
+        loadUserStats();
+      } catch (error) {
+        console.error('Error loading profile data in Profile Page:', error);
+        // Set fallback values on error
+        const profileNameEl = document.getElementById('profileName');
+        if (profileNameEl) {
+          profileNameEl.textContent = 'Citizen User';
+        }
+        
+        const profileRoleEl = document.getElementById('profileRole');
+        if (profileRoleEl) {
+          profileRoleEl.textContent = 'Community Member';
+        }
+        
+        const avatarEl = document.getElementById('profileAvatar');
+        if (avatarEl) {
+          avatarEl.innerHTML = `C<div class="camera-overlay">📷</div>`;
+        }
+      }
+    }
+
+    // Load user statistics
+    function loadUserStats() {
+      try {
+        const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+        const issues = JSON.parse(localStorage.getItem('issues') || '[]');
+        
+        // Combine both issue sources
+        const allIssues = [...userIssues, ...issues];
+        
+        const totalIssues = allIssues.length;
+        const resolvedIssues = allIssues.filter(issue => issue.status === 'Resolved').length;
+        
+        // Update DOM elements safely
+        const totalEl = document.getElementById('issuesReported');
+        if (totalEl) totalEl.textContent = totalIssues;
+        
+        const resolvedEl = document.getElementById('issuesResolved');
+        if (resolvedEl) resolvedEl.textContent = resolvedIssues;
+        
+        // Calculate rank based on issues reported
+        let rank = '--';
+        if (totalIssues >= 10) {
+          rank = window.languageManager ? window.languageManager.t('gold') : 'Gold';
+        } else if (totalIssues >= 5) {
+          rank = window.languageManager ? window.languageManager.t('silver') : 'Silver';
+        } else if (totalIssues >= 1) {
+          rank = window.languageManager ? window.languageManager.t('bronze') : 'Bronze';
+        }
+        
+        const rankEl = document.getElementById('communityRank');
+        if (rankEl) rankEl.textContent = rank;
+      } catch (error) {
+        console.error('Error loading user stats:', error);
+        // Set fallback values
+        const totalEl = document.getElementById('issuesReported');
+        if (totalEl) totalEl.textContent = '0';
+        
+        const resolvedEl = document.getElementById('issuesResolved');
+        if (resolvedEl) resolvedEl.textContent = '0';
+        
+        const rankEl = document.getElementById('communityRank');
+        if (rankEl) rankEl.textContent = '--';
+      }
+    }
+
+    // Update notification badge
+    function updateNotificationBadge() {
+      const unreadCount = localStorage.getItem('unreadNotificationCount') || '0';
+      const badge = document.getElementById('notificationBadge');
+      
+      if (badge) {
+        if (parseInt(unreadCount) > 0) {
+          badge.textContent = unreadCount;
+          badge.style.display = 'flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    }
+
+    // Profile picture change
+    function changeProfilePicture() {
+      document.getElementById('profileImageInput').click();
+    }
+
+    function handleProfileImageChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          alert('Please select a valid image file.');
+          return;
+        }
+        
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          alert('Image file is too large. Please select an image smaller than 5MB.');
+          return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imageData = e.target.result;
+          
+          try {
+            // Update profile image in localStorage
+            const profileData = JSON.parse(localStorage.getItem('userProfile') || '{}');
+            profileData.profileImage = imageData;
+            profileData.setupCompleted = true; // Ensure profile is marked as complete
+            profileData.setupDate = profileData.setupDate || new Date().toISOString();
+            profileData.lastUpdated = new Date().toISOString();
+            localStorage.setItem('userProfile', JSON.stringify(profileData));
+            
+            // Update avatar display
+            const avatarEl = document.getElementById('profileAvatar');
+            if (avatarEl) {
+              avatarEl.innerHTML = `<img src="${imageData}" alt="Profile"><div class="camera-overlay">📷</div>`;
+            }
+            
+            console.log('Profile image updated successfully and data synchronized');
+            
+            // Show success message
+            setTimeout(() => {
+              alert('Profile picture updated successfully!');
+            }, 100);
+          } catch (error) {
+            console.error('Error updating profile image:', error);
+            alert('Error updating profile picture. Please try again.');
+          }
+        };
+        
+        reader.onerror = function() {
+          console.error('Error reading file');
+          alert('Error reading the image file. Please try again.');
+        };
+        
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Settings functions
+    function editProfile() {
+      window.location.href = '../SetUp Profile Page/index.html';
+    }
+
+    function manageNotifications() {
+      window.location.href = '../Notifications Page/index.html';
+    }
+
+    function changeLanguage() {
+      console.log('changeLanguage called');
+      try {
+        showLanguageModal();
+      } catch (error) {
+        console.error('Error in changeLanguage:', error);
+        // Fallback to simple prompt if modal fails
+        showSimpleLanguageSelection();
+      }
+    }
+
+    function showSimpleLanguageSelection() {
+      const languages = [
+        { code: 'en', name: 'English' },
+        { code: 'es', name: 'Español' },
+        { code: 'fr', name: 'Français' }
+      ];
+      
+      const currentLang = typeof window.languageManager !== 'undefined' ? window.languageManager.getCurrentLanguage() : 'en';
+      
+      let message = 'Select your preferred language:\n\n';
+      languages.forEach((lang, index) => {
+        const isCurrent = lang.code === currentLang;
+        message += `${index + 1}. ${lang.name}${isCurrent ? ' (Current)' : ''}\n`;
+      });
+      
+      const choice = prompt(message + '\nEnter number (1-3):');
+      const choiceNum = parseInt(choice);
+      
+      if (choiceNum >= 1 && choiceNum <= languages.length) {
+        const selectedLang = languages[choiceNum - 1];
+        
+        if (typeof window.languageManager !== 'undefined') {
+          window.languageManager.setLanguage(selectedLang.code);
+          window.languageManager.updatePageTranslations();
+          loadUserProfile();
+          alert(`Language changed to: ${selectedLang.name}`);
+        } else {
+          localStorage.setItem('selectedLanguage', selectedLang.code);
+          alert(`Language changed to: ${selectedLang.name}. Please refresh the page.`);
+          location.reload();
+        }
+      }
+    }
+
+    let selectedLanguageCode = null;
+
+    function showLanguageModal() {
+      console.log('showLanguageModal called');
+      
+      // Check if languageManager is available
+      if (typeof window.languageManager === 'undefined') {
+        console.error('languageManager not available, using fallback');
+        showSimpleLanguageSelection();
+        return;
+      }
+      
+      const modal = document.getElementById('languageModal');
+      const optionsContainer = document.getElementById('languageOptions');
+      
+      if (!modal || !optionsContainer) {
+        console.error('Modal elements not found, using fallback');
+        showSimpleLanguageSelection();
+        return;
+      }
+      
+      try {
+        const currentLang = window.languageManager.getCurrentLanguage();
+        selectedLanguageCode = currentLang; // Initialize with current language
+        
+        const languages = [
+          { code: 'en', name: 'English', native: 'English', flag: '🇺🇸' },
+          { code: 'es', name: 'Spanish', native: 'Español', flag: '🇪🇸' },
+          { code: 'fr', name: 'French', native: 'Français', flag: '🇫🇷' }
+        ];
+        
+        optionsContainer.innerHTML = languages.map(lang => `
+          <div class="language-option ${lang.code === currentLang ? 'selected' : ''}" 
+               onclick="selectLanguage('${lang.code}')" data-lang="${lang.code}">
+            <div class="language-flag">${lang.flag}</div>
+            <div class="language-info">
+              <div class="language-name">${lang.name}</div>
+              <div class="language-native">${lang.native}</div>
+            </div>
+            <div class="language-check">✓</div>
+          </div>
+        `).join('');
+        
+        modal.classList.add('show');
+        console.log('Modal should be visible now');
+      } catch (error) {
+        console.error('Error in showLanguageModal:', error);
+        showSimpleLanguageSelection();
+      }
+    }
+
+    function selectLanguage(langCode) {
+      selectedLanguageCode = langCode;
+      
+      // Update visual selection
+      document.querySelectorAll('.language-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+      
+      document.querySelector(`[data-lang="${langCode}"]`).classList.add('selected');
+    }
+
+    function applyLanguageChange() {
+      console.log('Applying language change to:', selectedLanguageCode);
+      
+      if (selectedLanguageCode && typeof window.languageManager !== 'undefined') {
+        try {
+          window.languageManager.setLanguage(selectedLanguageCode);
+          
+          // Update all translations on current page
+          window.languageManager.updatePageTranslations();
+          
+          // Reload profile data with new language
+          loadUserProfile();
+          
+          // Show success message
+          const langNames = {
+            'en': 'English',
+            'es': 'Español', 
+            'fr': 'Français'
+          };
+          
+          setTimeout(() => {
+            alert(`${window.languageManager.t('languageChanged')} ${langNames[selectedLanguageCode]}`);
+          }, 100);
+          
+          console.log('Language change applied successfully');
+        } catch (error) {
+          console.error('Error applying language change:', error);
+          alert('Error changing language. Please try again.');
+        }
+      } else {
+        console.error('Cannot apply language change: languageManager not available or no language selected');
+        alert('Error: Language system not available.');
+      }
+      
+      closeLanguageModal();
+    }
+
+    function closeLanguageModal() {
+      const modal = document.getElementById('languageModal');
+      modal.classList.remove('show');
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', function(event) {
+      const modal = document.getElementById('languageModal');
+      const modalContent = document.querySelector('.language-content');
+      
+      if (modal.classList.contains('show') && !modalContent.contains(event.target)) {
+        closeLanguageModal();
+      }
+    });
+
+    function showHelp() {
+      const helpContent = languageManager ? 
+        languageManager.t('helpContent') : 
+        'Help & Support\n\n• How to report issues\n• Community guidelines\n• Contact support: support@citizenconnect.com\n• FAQ and troubleshooting';
+      alert(helpContent);
+    }
+
+    function showAbout() {
+      const aboutContent = languageManager ? 
+        languageManager.t('aboutContent') : 
+        'Citizen Connect v2.1.0\n\n• Report civic issues in your community\n• Track issue resolution progress\n• Connect with local government\n• Make your community better\n\n© 2024 Citizen Connect. All rights reserved.';
+      alert(aboutContent);
+    }
+
+    function logout() {
+      const confirmMessage = languageManager ? 
+        languageManager.t('logoutConfirm') : 
+        'Are you sure you want to logout?';
+      
+      if (confirm(confirmMessage)) {
+        // Clear user data but keep language preference
+        const selectedLanguage = localStorage.getItem('selectedLanguage');
+        localStorage.clear();
+        if (selectedLanguage) {
+          localStorage.setItem('selectedLanguage', selectedLanguage);
+        }
+        alert('Logged out successfully');
+        window.location.href = '../Login and SignUp Page/index.html';
+      }
+    }
+
+    // Navigation functions
+    function goBack() {
+      window.location.href = '../Main UI/index.html';
+    }
+
+    function goToHome() {
+      window.location.href = '../Main UI/index.html';
+    }
+
+    function startReporting() {
+      console.log('startReporting function called from Profile page');
+      try {
+        window.location.href = '../Capture Photo Page/index.html';
+      } catch (error) {
+        console.error('Error navigating to Capture Photo Page:', error);
+        alert('Error starting the reporting process. Please try again.');
+      }
+    }
+
+    function viewMyIssues() {
+      window.location.href = '../My Issues Page/index.html';
+    }
+
+    function exploreMap() {
+      window.location.href = '../Explore Map Page/index.html';
+    }
+
+    function showProfile() {
+      // Already on profile page
+      updateActiveNav('profile');
+    }
+
+    function showNotifications() {
+      window.location.href = '../Notifications Page/index.html';
+    }
+
+    function updateActiveNav(activeItem) {
+      // Remove active class from all nav items
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Add active class based on active item
+      if (activeItem === 'profile') {
+        document.querySelector('.nav-item:last-child').classList.add('active');
+      }
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Page loaded, initializing...');
+      
+      // Initialize language manager with better error handling
+      let languageManagerReady = false;
+      try {
+        if (typeof window.languageManager !== 'undefined') {
+          window.languageManager.updatePageTranslations();
+          languageManagerReady = true;
+          console.log('Language manager initialized successfully');
+        } else {
+          console.warn('languageManager not available, continuing without translations');
+          // Set a fallback for missing languageManager
+          window.languageManager = {
+            t: function(key) { return key; },
+            getCurrentLanguage: function() { return 'en'; },
+            setLanguage: function(lang) { localStorage.setItem('selectedLanguage', lang); },
+            updatePageTranslations: function() {}
+          };
+        }
+      } catch (error) {
+        console.error('Error initializing language manager:', error);
+        // Create a minimal fallback languageManager
+        window.languageManager = {
+          t: function(key) { return key; },
+          getCurrentLanguage: function() { return 'en'; },
+          setLanguage: function(lang) { localStorage.setItem('selectedLanguage', lang); },
+          updatePageTranslations: function() {}
+        };
+      }
+      
+      loadUserProfile();
+      updateNotificationBadge();
+      
+      // Debug: Log current localStorage data
+      console.log('=== Profile Page Debug Info ===');
+      console.log('userProfile:', localStorage.getItem('userProfile'));
+      console.log('userData:', localStorage.getItem('userData'));
+      console.log('===============================');
+      
+      // Set up navigation click handlers
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach((item, index) => {
+        item.addEventListener('click', function() {
+          // Remove active from all
+          navItems.forEach(nav => nav.classList.remove('active'));
+          // Add active to clicked
+          this.classList.add('active');
+        });
+      });
+      
+      // Add storage event listener for cross-page synchronization
+      window.addEventListener('storage', function(event) {
+        console.log('Storage event detected:', event.key);
+        if (event.key === 'userProfile' || event.key === 'userData') {
+          console.log('User data changed in another tab, reloading profile...');
+          loadUserProfile();
+        }
+      });
+      
+      console.log('Page initialization complete');
+    });
+  </script>
+</body>
+</html>

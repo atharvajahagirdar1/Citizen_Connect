@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Location Tracking</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
+        .error { background-color: #fee; border-color: #f00; }
+        .success { background-color: #efe; border-color: #0f0; }
+        .info { background-color: #eef; border-color: #00f; }
+        button { margin: 5px; padding: 10px 15px; cursor: pointer; }
+        .log { font-family: monospace; font-size: 12px; background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Location Tracking Debug Page</h1>
+    
+    <div class="section info">
+        <h3>Browser Support Check</h3>
+        <div id="browserSupport"></div>
+    </div>
+    
+    <div class="section">
+        <h3>Location Testing</h3>
+        <button onclick="testGeolocation()">Test Geolocation API</button>
+        <button onclick="testLocationServices()">Test Location Services</button>
+        <button onclick="clearLocationData()">Clear Location Data</button>
+        <div id="testResults"></div>
+    </div>
+    
+    <div class="section">
+        <h3>Location Data</h3>
+        <div id="locationData"></div>
+    </div>
+    
+    <div class="section">
+        <h3>Console Logs</h3>
+        <div id="consoleLogs" class="log"></div>
+    </div>
+
+    <script>
+        // Override console.log to display in our debug panel
+        const originalLog = console.log;
+        const consoleLogs = document.getElementById('consoleLogs');
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const logEntry = document.createElement('div');
+            logEntry.textContent = new Date().toLocaleTimeString() + ': ' + args.join(' ');
+            consoleLogs.appendChild(logEntry);
+            consoleLogs.scrollTop = consoleLogs.scrollHeight;
+        };
+
+        // Check browser support
+        function checkBrowserSupport() {
+            const supportDiv = document.getElementById('browserSupport');
+            let html = '';
+            
+            // Check if geolocation is supported
+            if ('geolocation' in navigator) {
+                html += '<p>✅ Geolocation API is supported</p>';
+                
+                // Check specific methods
+                if (navigator.geolocation.getCurrentPosition) {
+                    html += '<p>✅ getCurrentPosition() is available</p>';
+                } else {
+                    html += '<p>❌ getCurrentPosition() is NOT available</p>';
+                }
+                
+                if (navigator.geolocation.watchPosition) {
+                    html += '<p>✅ watchPosition() is available</p>';
+                } else {
+                    html += '<p>❌ watchPosition() is NOT available</p>';
+                }
+            } else {
+                html += '<p>❌ Geolocation API is NOT supported</p>';
+            }
+            
+            // Check HTTPS requirement
+            if (location.protocol === 'https:') {
+                html += '<p>✅ Running on HTTPS (required for geolocation)</p>';
+            } else if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+                html += '<p>✅ Running on localhost (geolocation allowed)</p>';
+            } else {
+                html += '<p>⚠️ Running on HTTP - geolocation may be blocked</p>';
+            }
+            
+            supportDiv.innerHTML = html;
+        }
+
+        // Test geolocation API
+        function testGeolocation() {
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '<p>🔄 Testing geolocation...</p>';
+            
+            if (!navigator.geolocation) {
+                resultsDiv.innerHTML = '<div class="error">❌ Geolocation is not supported</div>';
+                return;
+            }
+            
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            };
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const html = `
+                        <div class="success">
+                            <h4>✅ Location Retrieved Successfully</h4>
+                            <p><strong>Latitude:</strong> ${position.coords.latitude}</p>
+                            <p><strong>Longitude:</strong> ${position.coords.longitude}</p>
+                            <p><strong>Accuracy:</strong> ${Math.round(position.coords.accuracy)} meters</p>
+                            <p><strong>Altitude:</strong> ${position.coords.altitude || 'N/A'}</p>
+                            <p><strong>Speed:</strong> ${position.coords.speed || 'N/A'}</p>
+                            <p><strong>Heading:</strong> ${position.coords.heading || 'N/A'}</p>
+                            <p><strong>Timestamp:</strong> ${new Date(position.timestamp).toLocaleString()}</p>
+                        </div>
+                    `;
+                    resultsDiv.innerHTML = html;
+                    
+                    // Update location data display
+                    updateLocationDataDisplay(position);
+                },
+                function(error) {
+                    let errorMessage = 'Unknown error';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = 'Permission denied - user blocked location access';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = 'Position unavailable - GPS/location services may be disabled';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = 'Request timed out - GPS signal may be weak';
+                            break;
+                    }
+                    
+                    resultsDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Location Error</h4>
+                            <p><strong>Error Code:</strong> ${error.code}</p>
+                            <p><strong>Message:</strong> ${errorMessage}</p>
+                            <p><strong>Technical Message:</strong> ${error.message}</p>
+                        </div>
+                    `;
+                },
+                options
+            );
+        }
+
+        // Test location services
+        function testLocationServices() {
+            console.log('🔍 Testing location services...');
+            
+            // Test if we can access the location API
+            if (navigator.permissions) {
+                navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
+                    console.log('📍 Permission status:', result.state);
+                    
+                    if (result.state === 'denied') {
+                        console.log('❌ Location permission is denied');
+                        alert('Location permission is denied. Please enable it in your browser settings.');
+                    } else if (result.state === 'prompt') {
+                        console.log('⚠️ Location permission needs to be granted');
+                        alert('Please grant location permission when prompted.');
+                    } else {
+                        console.log('✅ Location permission is granted');
+                        testGeolocation();
+                    }
+                }).catch(function(error) {
+                    console.log('⚠️ Could not check permission status:', error);
+                    // Fallback - just try to get location
+                    testGeolocation();
+                });
+            } else {
+                console.log('⚠️ Permissions API not available, trying direct geolocation');
+                testGeolocation();
+            }
+        }
+
+        // Update location data display
+        function updateLocationDataDisplay(position) {
+            const dataDiv = document.getElementById('locationData');
+            
+            if (!position) {
+                dataDiv.innerHTML = '<p>No location data available</p>';
+                return;
+            }
+            
+            const locationData = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                accuracy: position.coords.accuracy,
+                altitude: position.coords.altitude,
+                altitudeAccuracy: position.coords.altitudeAccuracy,
+                heading: position.coords.heading,
+                speed: position.coords.speed,
+                timestamp: position.timestamp
+            };
+            
+            dataDiv.innerHTML = `
+                <h4>Raw Location Data</h4>
+                <pre>${JSON.stringify(locationData, null, 2)}</pre>
+                
+                <h4>LocalStorage Test</h4>
+                <button onclick="testLocalStorage()">Test LocalStorage</button>
+                <div id="localStorageResult"></div>
+            `;
+        }
+
+        // Test localStorage
+        function testLocalStorage() {
+            try {
+                const testData = { test: 'data', timestamp: Date.now() };
+                localStorage.setItem('test_location', JSON.stringify(testData));
+                const retrieved = JSON.parse(localStorage.getItem('test_location'));
+                localStorage.removeItem('test_location');
+                
+                document.getElementById('localStorageResult').innerHTML = `
+                    <div class="success">
+                        <p>✅ LocalStorage is working</p>
+                        <p>Stored and retrieved: ${JSON.stringify(retrieved)}</p>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('localStorageResult').innerHTML = `
+                    <div class="error">
+                        <p>❌ LocalStorage error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Clear location data
+        function clearLocationData() {
+            localStorage.removeItem('reportLocation');
+            localStorage.removeItem('reportedIssueLocation');
+            console.log('🗑️ Location data cleared from localStorage');
+            alert('Location data cleared from localStorage');
+        }
+
+        // Initialize
+        window.onload = function() {
+            console.log('🚀 Location Debug Page Loaded');
+            checkBrowserSupport();
+            
+            // Check if we have any existing location data
+            const existingLocation = localStorage.getItem('reportLocation');
+            if (existingLocation) {
+                console.log('📍 Found existing location data:', JSON.parse(existingLocation));
+            } else {
+                console.log('📍 No existing location data found');
+            }
+        };
+    </script>
+</body>
+</html>

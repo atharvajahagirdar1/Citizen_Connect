@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test User Flow - Data Synchronization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-button:hover {
+            background: #357ae8;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .localstorage-data {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test User Flow - Data Synchronization</h1>
+    <p>This page tests the user data synchronization between Login, Profile Setup, and Main UI pages.</p>
+
+    <div class="test-section">
+        <h2>Step 1: Simulate Login/Signup</h2>
+        <button class="test-button" onclick="simulateLogin()">Simulate User Login</button>
+        <button class="test-button" onclick="simulateNewUserSignup()">Simulate New User Signup</button>
+        <div id="login-status" class="status info">Ready to test login flow...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 2: Simulate Profile Setup</h2>
+        <button class="test-button" onclick="simulateProfileSetup()">Simulate Profile Setup</button>
+        <button class="test-button" onclick="simulateProfileUpdate()">Simulate Profile Update</button>
+        <div id="profile-status" class="status info">Ready to test profile setup...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 3: Test Main UI Loading</h2>
+        <button class="test-button" onclick="testMainUILoading()">Test Main UI Data Loading</button>
+        <button class="test-button" onclick="testStorageSync()">Test Storage Synchronization</button>
+        <div id="mainui-status" class="status info">Ready to test Main UI loading...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Current LocalStorage Data</h2>
+        <button class="test-button" onclick="refreshLocalStorageDisplay()">Refresh Display</button>
+        <button class="test-button" onclick="clearLocalStorage()">Clear All Data</button>
+        <div id="localstorage-display" class="localstorage-data">Loading...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results" class="status info">No tests run yet...</div>
+    </div>
+
+    <script>
+        // Test data
+        const testUserData = {
+            email: "testuser@example.com",
+            name: "Test User",
+            isNewUser: true,
+            loginDate: new Date().toISOString()
+        };
+
+        const testProfileData = {
+            fullName: "John Doe",
+            role: "citizen",
+            language: "en",
+            profileImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0MCIgZmlsbD0iIzQyODVmNCIvPjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+SkQ8L3RleHQ+PC9zdmc+",
+            setupCompleted: true,
+            setupDate: new Date().toISOString(),
+            lastUpdated: new Date().toISOString()
+        };
+
+        const updatedProfileData = {
+            ...testProfileData,
+            fullName: "Jane Smith",
+            role: "community_volunteer",
+            lastUpdated: new Date().toISOString()
+        };
+
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+
+        function addTestResult(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const timestamp = new Date().toLocaleTimeString();
+            results.innerHTML += `[${timestamp}] ${message}<br>`;
+            results.className = `status ${type}`;
+        }
+
+        function refreshLocalStorageDisplay() {
+            try {
+                const data = {};
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    const value = localStorage.getItem(key);
+                    try {
+                        data[key] = JSON.parse(value);
+                    } catch {
+                        data[key] = value;
+                    }
+                }
+                document.getElementById('localstorage-display').textContent = 
+                    JSON.stringify(data, null, 2) || 'No data in localStorage';
+            } catch (error) {
+                document.getElementById('localstorage-display').textContent = 
+                    `Error reading localStorage: ${error.message}`;
+            }
+        }
+
+        function clearLocalStorage() {
+            if (confirm('Clear all localStorage data?')) {
+                localStorage.clear();
+                refreshLocalStorageDisplay();
+                updateStatus('test-results', 'LocalStorage cleared successfully', 'success');
+            }
+        }
+
+        function simulateLogin() {
+            try {
+                localStorage.setItem('userData', JSON.stringify(testUserData));
+                updateStatus('login-status', 'Login simulated successfully', 'success');
+                addTestResult('✅ Login simulation completed', 'success');
+                refreshLocalStorageDisplay();
+            } catch (error) {
+                updateStatus('login-status', `Login simulation failed: ${error.message}`, 'error');
+                addTestResult(`❌ Login simulation failed: ${error.message}`, 'error');
+            }
+        }
+
+        function simulateNewUserSignup() {
+            try {
+                const newUserData = {
+                    ...testUserData,
+                    isNewUser: true,
+                    signupDate: new Date().toISOString()
+                };
+                localStorage.setItem('userData', JSON.stringify(newUserData));
+                updateStatus('login-status', 'New user signup simulated successfully', 'success');
+                addTestResult('✅ New user signup simulation completed', 'success');
+                refreshLocalStorageDisplay();
+            } catch (error) {
+                updateStatus('login-status', `Signup simulation failed: ${error.message}`, 'error');
+                addTestResult(`❌ Signup simulation failed: ${error.message}`, 'error');
+            }
+        }
+
+        function simulateProfileSetup() {
+            try {
+                // Simulate profile setup by saving profile data
+                localStorage.setItem('userProfile', JSON.stringify(testProfileData));
+                
+                // Update userData to remove new user flag
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                if (userData.isNewUser) {
+                    delete userData.isNewUser;
+                    userData.name = testProfileData.fullName;
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                }
+                
+                updateStatus('profile-status', 'Profile setup simulated successfully', 'success');
+                addTestResult('✅ Profile setup simulation completed', 'success');
+                refreshLocalStorageDisplay();
+            } catch (error) {
+                updateStatus('profile-status', `Profile setup failed: ${error.message}`, 'error');
+                addTestResult(`❌ Profile setup failed: ${error.message}`, 'error');
+            }
+        }
+
+        function simulateProfileUpdate() {
+            try {
+                // Simulate profile update
+                localStorage.setItem('userProfile', JSON.stringify(updatedProfileData));
+                
+                updateStatus('profile-status', 'Profile update simulated successfully', 'success');
+                addTestResult('✅ Profile update simulation completed', 'success');
+                refreshLocalStorageDisplay();
+            } catch (error) {
+                updateStatus('profile-status', `Profile update failed: ${error.message}`, 'error');
+                addTestResult(`❌ Profile update failed: ${error.message}`, 'error');
+            }
+        }
+
+        function testMainUILoading() {
+            try {
+                // Simulate the Main UI loading logic
+                const userProfile = localStorage.getItem('userProfile');
+                const userData = localStorage.getItem('userData');
+                
+                let profileData = null;
+                let displayName = 'Unknown User';
+                let displayRole = 'User';
+                
+                if (userProfile) {
+                    try {
+                        profileData = JSON.parse(userProfile);
+                        displayName = profileData.fullName || profileData.name || 'Unknown User';
+                        displayRole = profileData.role || 'User';
+                    } catch (e) {
+                        console.error('Error parsing userProfile:', e);
+                    }
+                } else if (userData) {
+                    try {
+                        const data = JSON.parse(userData);
+                        displayName = data.name || 'Unknown User';
+                        displayRole = 'User';
+                    } catch (e) {
+                        console.error('Error parsing userData:', e);
+                    }
+                }
+                
+                updateStatus('mainui-status', `Main UI would display: ${displayName} (${displayRole})`, 'success');
+                addTestResult(`✅ Main UI loading test completed - User: ${displayName}, Role: ${displayRole}`, 'success');
+                
+            } catch (error) {
+                updateStatus('mainui-status', `Main UI loading test failed: ${error.message}`, 'error');
+                addTestResult(`❌ Main UI loading test failed: ${error.message}`, 'error');
+            }
+        }
+
+        function testStorageSync() {
+            try {
+                // Test storage synchronization by simulating changes
+                addTestResult('🔄 Testing storage synchronization...', 'info');
+                
+                // Listen for storage events
+                let syncTestPassed = false;
+                const storageListener = function(event) {
+                    if (event.key === 'userProfile' || event.key === 'userData') {
+                        addTestResult(`✅ Storage sync detected for ${event.key}`, 'success');
+                        syncTestPassed = true;
+                    }
+                };
+                
+                window.addEventListener('storage', storageListener);
+                
+                // Simulate a change that should trigger sync
+                const currentProfile = localStorage.getItem('userProfile');
+                if (currentProfile) {
+                    const profile = JSON.parse(currentProfile);
+                    profile.lastUpdated = new Date().toISOString();
+                    localStorage.setItem('userProfile', JSON.stringify(profile));
+                    
+                    setTimeout(() => {
+                        window.removeEventListener('storage', storageListener);
+                        if (syncTestPassed) {
+                            updateStatus('mainui-status', 'Storage synchronization working correctly', 'success');
+                        } else {
+                            updateStatus('mainui-status', 'Storage sync test completed (single tab mode)', 'info');
+                            addTestResult('ℹ️ Storage events only fire across tabs/windows, not within same tab', 'info');
+                        }
+                    }, 1000);
+                } else {
+                    addTestResult('ℹ️ No profile data found for sync test', 'info');
+                    window.removeEventListener('storage', storageListener);
+                }
+                
+            } catch (error) {
+                addTestResult(`❌ Storage sync test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshLocalStorageDisplay();
+            addTestResult('🚀 Test page initialized and ready', 'success');
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            // Clean up any event listeners if needed
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location Selection - Citizen Connect</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: #f8fafb;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 430px;
+      margin: 0 auto;
+      background: white;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 50px 20px 30px 20px;
+      background: white;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .back-button {
+      background: #f5f5f5;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-right: 15px;
+      font-size: 18px;
+      transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+      background: #fff3cd;
+      transform: scale(1.05);
+    }
+
+    .header-title {
+      flex: 1;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    /* Content */
+    .content {
+      padding: 20px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Location styles */
+    .location-container {
+      padding: 0;
+    }
+    
+    .location-info {
+      background: #f8f9fa;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      text-align: left;
+      border: 2px solid #e9ecef;
+      transition: all 0.3s ease;
+    }
+
+    .location-info:hover {
+      border-color: #ffc107;
+      background: #fff3cd;
+    }
+    
+    .location-label {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    
+    .location-value {
+      font-size: 16px;
+      color: #1a1a1a;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .location-accuracy {
+      font-size: 12px;
+      color: #28a745;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .input-group {
+      margin-bottom: 24px;
+    }
+    
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #1a1a1a;
+      font-size: 16px;
+    }
+    
+    .input-group input {
+      width: 100%;
+      padding: 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 16px;
+      background: white;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: #4285f4;
+      box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+    }
+
+    .input-group input:hover {
+      border-color: #ffc107;
+      background: #fff3cd;
+    }
+    
+    .action-button {
+      background: #4285f4;
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 12px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+    }
+    
+    .action-button:hover {
+      background: #fff3cd;
+      color: #333;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .action-button:disabled {
+      background: #e5e7eb;
+      color: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .action-button.secondary {
+      background: transparent;
+      color: #4285f4;
+      border: 2px solid #4285f4;
+      box-shadow: none;
+    }
+
+    .action-button.secondary:hover {
+      background: #fff3cd;
+      border-color: #ffc107;
+      color: #333;
+    }
+
+    /* Loading state */
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #ffffff;
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Error state */
+    .error {
+      background: #fee;
+      border-color: #dc3545;
+      color: #721c24;
+    }
+
+    .error-message {
+      color: #dc3545;
+      font-size: 14px;
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: #f8d7da;
+      border-radius: 8px;
+      border: 1px solid #f5c6cb;
+    }
+
+    /* Success state */
+    .success {
+      background: #d4edda;
+      border-color: #28a745;
+      color: #155724;
+    }
+
+    /* Responsive */
+    @media (max-width: 430px) {
+      .container {
+        max-width: 100%;
+      }
+      
+      .header {
+        padding: 40px 15px 25px 15px;
+      }
+      
+      .content {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <button class="back-button" onclick="goBack()">←</button>
+      <div class="header-title">Select Location</div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="section-title">
+        📍 Location for Your Report
+      </div>
+
+      <div class="location-container">
+        <div class="location-info" id="currentLocation">
+          <div class="location-label">📍 Current Location</div>
+          <div class="location-value" id="locationValue">Getting your location...</div>
+          <div class="location-accuracy" id="locationAccuracy" style="display: none;">
+            ✓ Accurate to within 10 meters
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label for="manualLocation">🏠 Or Enter Location Manually</label>
+          <input type="text" id="manualLocation" placeholder="Enter street address, landmark, or area name">
+        </div>
+        
+        <button class="action-button" onclick="useCurrentLocation()" id="useCurrentBtn">
+          <span id="currentBtnIcon">📍</span>
+          <span id="currentBtnText">Use Current Location</span>
+        </button>
+        
+        <button class="action-button secondary" onclick="useManualLocation()">
+          📝 Use Entered Location
+        </button>
+        
+        <button class="action-button secondary" onclick="retryLocation()" id="retryBtn" style="display: none;">
+          🔄 Retry Getting Location
+        </button>
+        
+        <!-- Test and Debug Section -->
+        <div class="test-section" style="margin-top: 20px; padding: 15px; border: 2px solid #e5e7eb; border-radius: 12px; background-color: #f8f9fa;">
+          <h4 style="font-size: 16px; margin-bottom: 8px;">🔧 Location Test & Debug</h4>
+          <p style="font-size: 14px; color: #6b7280; margin-bottom: 12px;">Having trouble with location? Run this test to diagnose the issue.</p>
+          <button class="action-button secondary" onclick="runLocationTest()" style="margin-bottom: 0;">
+            <span class="btn-icon">🧪</span>
+            <span class="btn-text">Run Location Test</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentLocationData = null;
+    let locationWatchId = null;
+
+    // Get current location using browser's geolocation
+    function getCurrentLocation() {
+      const locationValueEl = document.getElementById('locationValue');
+      const useCurrentBtnEl = document.getElementById('useCurrentBtn');
+      const currentBtnIcon = document.getElementById('currentBtnIcon');
+      const currentBtnText = document.getElementById('currentBtnText');
+      const locationAccuracy = document.getElementById('locationAccuracy');
+      const retryBtn = document.getElementById('retryBtn');
+      
+      console.log('🌍 Starting location detection...');
+      
+      if (!navigator.geolocation) {
+        console.error('❌ Geolocation API not available');
+        showLocationError('Geolocation is not supported by this browser');
+        return;
+      }
+      
+      // Check permissions first (if supported)
+      if (navigator.permissions) {
+        navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
+          console.log('📍 Permission status:', result.state);
+          if (result.state === 'denied') {
+            showLocationError('Location permission denied. Please enable it in your browser settings.');
+            return;
+          }
+        }).catch(function(error) {
+          console.log('⚠️ Could not check permissions:', error);
+        });
+      }
+      
+      // Update UI to loading state
+      locationValueEl.textContent = 'Getting your location...';
+      currentBtnIcon.textContent = '⏳';
+      currentBtnText.textContent = 'Getting Location...';
+      useCurrentBtnEl.disabled = true;
+      useCurrentBtnEl.classList.add('loading');
+      
+      const options = {
+        enableHighAccuracy: true,
+        timeout: 10000, // Reduced timeout for faster response
+        maximumAge: 60000
+      };
+      
+      console.log('📡 Requesting location with options:', options);
+      
+      // Set up timeout fallback
+      let timeoutId = setTimeout(function() {
+        console.log('⏰ Location request timeout - trying low accuracy mode');
+        
+        // Try again with lower accuracy for faster response
+        const fallbackOptions = {
+          enableHighAccuracy: false,
+          timeout: 5000,
+          maximumAge: 300000 // 5 minutes
+        };
+        
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            console.log('✅ Fallback location obtained:', position);
+            handleLocationSuccess(position);
+          },
+          function(error) {
+            console.log('❌ Fallback also failed:', error);
+            handleLocationError(error);
+          },
+          fallbackOptions
+        );
+      }, 8000); // Try fallback after 8 seconds
+      
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          clearTimeout(timeoutId);
+          console.log('✅ Location obtained successfully:', position);
+          handleLocationSuccess(position);
+        },
+        function(error) {
+          clearTimeout(timeoutId);
+          console.error('❌ Geolocation error:', error);
+          handleLocationError(error);
+        },
+        options
+      );
+      
+      // Helper functions
+      function handleLocationSuccess(position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const accuracy = position.coords.accuracy;
+        
+        console.log('📍 Coordinates:', { lat, lon, accuracy });
+        
+        // Store coordinates
+        currentLocationData = {
+          latitude: lat,
+          longitude: lon,
+          accuracy: accuracy,
+          timestamp: new Date().toISOString()
+        };
+        
+        // Try to get human-readable address
+        reverseGeocode(lat, lon, accuracy);
+      }
+      
+      function handleLocationError(error) {
+        let errorMessage = 'Unable to get your location';
+        
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location access denied. Please enable location permissions in your browser settings.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information is unavailable. Make sure location services are enabled on your device.';
+            break;
+          case error.TIMEOUT:
+            errorMessage = 'Location request timed out. Please try again or check your GPS signal.';
+            break;
+        }
+        
+        console.log('🚫 Error message:', errorMessage);
+        showLocationError(errorMessage);
+      }
+    }
+
+    // Reverse geocode coordinates to get address
+    async function reverseGeocode(lat, lon, accuracy) {
+      const locationValueEl = document.getElementById('locationValue');
+      const useCurrentBtnEl = document.getElementById('useCurrentBtn');
+      const currentBtnIcon = document.getElementById('currentBtnIcon');
+      const currentBtnText = document.getElementById('currentBtnText');
+      const locationAccuracy = document.getElementById('locationAccuracy');
+      const currentLocationEl = document.getElementById('currentLocation');
+      
+      console.log('🗺️ Starting reverse geocoding for:', { lat, lon });
+      
+      try {
+        // Update UI for address lookup
+        locationValueEl.textContent = 'Getting address...';
+        
+        // Try multiple geocoding services with fallback
+        let address = await tryGeocodingServices(lat, lon);
+        
+        if (!address) {
+          // Fallback to coordinates
+          address = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+          console.log('📍 Using coordinates as address fallback');
+        }
+        
+        // Update location data
+        currentLocationData.address = address;
+        
+        // Update UI with success state
+        locationValueEl.textContent = address;
+        currentBtnIcon.textContent = '📍';
+        currentBtnText.textContent = 'Use Current Location';
+        useCurrentBtnEl.disabled = false;
+        useCurrentBtnEl.classList.remove('loading');
+        currentLocationEl.classList.add('success');
+        
+        // Show accuracy info
+        if (accuracy) {
+          const accuracyText = accuracy < 50 ? 
+            `✓ Accurate to within ${Math.round(accuracy)} meters` :
+            `⚠️ Approximate location (${Math.round(accuracy)}m accuracy)`;
+          locationAccuracy.textContent = accuracyText;
+          locationAccuracy.style.display = 'flex';
+        }
+        
+        console.log('✅ Address retrieved successfully:', address);
+        
+      } catch (error) {
+        console.error('❌ Reverse geocoding error:', error);
+        
+        // Use coordinates as fallback
+        const coordsStr = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+        currentLocationData.address = coordsStr;
+        
+        locationValueEl.textContent = coordsStr;
+        currentBtnIcon.textContent = '📍';
+        currentBtnText.textContent = 'Use Current Location';
+        useCurrentBtnEl.disabled = false;
+        useCurrentBtnEl.classList.remove('loading');
+        currentLocationEl.classList.add('success');
+        
+        // Show accuracy with coordinates
+        if (accuracy) {
+          locationAccuracy.textContent = `📍 Coordinates (${Math.round(accuracy)}m accuracy)`;
+          locationAccuracy.style.display = 'flex';
+        }
+      }
+    }
+    
+    // Try multiple geocoding services
+    async function tryGeocodingServices(lat, lon) {
+      const services = [
+        {
+          name: 'Nominatim',
+          url: `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`,
+          parser: (data) => formatNominatimAddress(data)
+        },
+        {
+          name: 'LocationIQ',
+          url: `https://us1.locationiq.com/v1/reverse.php?key=pk.7f9b1b999e9e1234567890abcdef&lat=${lat}&lon=${lon}&format=json`,
+          parser: (data) => data.display_name
+        }
+      ];
+      
+      for (const service of services) {
+        try {
+          console.log(`🗺️ Trying ${service.name}...`);
+          const response = await fetch(service.url);
+          
+          if (response.ok) {
+            const data = await response.json();
+            const address = service.parser(data);
+            if (address) {
+              console.log(`✅ ${service.name} succeeded:`, address);
+              return address;
+            }
+          }
+        } catch (error) {
+          console.warn(`⚠️ ${service.name} failed:`, error.message);
+        }
+      }
+      
+      console.log('⚠️ All geocoding services failed, returning null');
+      return null;
+    }
+    
+    // Format Nominatim address
+    function formatNominatimAddress(data) {
+      if (!data.address) return null;
+      
+      const parts = [];
+      if (data.address.house_number && data.address.road) {
+        parts.push(`${data.address.house_number} ${data.address.road}`);
+      } else if (data.address.road) {
+        parts.push(data.address.road);
+      }
+      if (data.address.neighbourhood) parts.push(data.address.neighbourhood);
+      if (data.address.suburb) parts.push(data.address.suburb);
+      if (data.address.city || data.address.town || data.address.village) {
+        parts.push(data.address.city || data.address.town || data.address.village);
+      }
+      
+      return parts.join(', ') || data.display_name;
+    }
+        
+        console.log('✅ Address retrieved successfully:', address);
+    
+
+    // Show location error
+    function showLocationError(errorMessage) {
+      const locationValueEl = document.getElementById('locationValue');
+      const useCurrentBtnEl = document.getElementById('useCurrentBtn');
+      const currentBtnIcon = document.getElementById('currentBtnIcon');
+      const currentBtnText = document.getElementById('currentBtnText');
+      const currentLocationEl = document.getElementById('currentLocation');
+      const retryBtn = document.getElementById('retryBtn');
+      
+      console.log('❌ Showing location error:', errorMessage);
+      
+      locationValueEl.textContent = errorMessage;
+      currentBtnIcon.textContent = '❌';
+      currentBtnText.textContent = 'Location Unavailable';
+      useCurrentBtnEl.disabled = true;
+      useCurrentBtnEl.classList.remove('loading');
+      currentLocationEl.classList.add('error');
+      retryBtn.style.display = 'block';
+      
+      // Show helpful suggestions based on error
+      if (errorMessage.includes('permission')) {
+        locationValueEl.innerHTML += '<br><small>💡 Tip: Check your browser settings and allow location access</small>';
+      } else if (errorMessage.includes('unavailable')) {
+        locationValueEl.innerHTML += '<br><small>💡 Tip: Make sure location services are enabled on your device</small>';
+      } else if (errorMessage.includes('timeout')) {
+        locationValueEl.innerHTML += '<br><small>💡 Tip: Try moving to an area with better GPS signal</small>';
+      }
+    }
+
+    // Retry getting location
+    function retryLocation() {
+      const currentLocationEl = document.getElementById('currentLocation');
+      const retryBtn = document.getElementById('retryBtn');
+      
+      // Reset UI state
+      currentLocationEl.classList.remove('error', 'success');
+      retryBtn.style.display = 'none';
+      
+      // Try again
+      getCurrentLocation();
+    }
+    
+    // Use current location
+    function useCurrentLocation() {
+      if (!currentLocationData || !currentLocationData.address) {
+        alert('Please wait for location to be detected or enter location manually');
+        return;
+      }
+      
+      // Store location data in localStorage
+      localStorage.setItem('reportLocation', JSON.stringify(currentLocationData));
+      localStorage.setItem('reportedIssueLocation', currentLocationData.address);
+      
+      console.log('Location data saved:', currentLocationData);
+      proceedToReportDetails();
+    }
+    
+    // Use manual location
+    function useManualLocation() {
+      const manualLocationEl = document.getElementById('manualLocation');
+      const manualLocation = manualLocationEl.value.trim();
+      
+      if (!manualLocation) {
+        alert('Please enter a location');
+        manualLocationEl.focus();
+        return;
+      }
+      
+      if (manualLocation.length < 3) {
+        alert('Please enter a more specific location');
+        manualLocationEl.focus();
+        return;
+      }
+      
+      // Store manual location
+      const locationData = {
+        address: manualLocation,
+        manual: true,
+        timestamp: new Date().toISOString()
+      };
+      
+      localStorage.setItem('reportLocation', JSON.stringify(locationData));
+      localStorage.setItem('reportedIssueLocation', manualLocation);
+      
+      console.log('Manual location saved:', locationData);
+      proceedToReportDetails();
+    }
+    
+    // Proceed to report details
+    function proceedToReportDetails() {
+      // Check if we have a captured photo
+      const capturedPhoto = localStorage.getItem('capturedPhoto');
+      if (!capturedPhoto) {
+        alert('No photo found. Please go back and capture a photo first.');
+        return;
+      }
+      
+      // Navigate to issue reporting page (create if doesn't exist)
+      window.location.href = '../Report Issue Page/index.html';
+    }
+
+    // Go back to capture photo page
+    function goBack() {
+      window.location.href = '../Capture Photo Page/index.html';
+    }
+    
+    // Initialize page
+    window.onload = function() {
+      console.log('Location Selection Page loaded');
+      
+      // Check if we have a captured photo
+      const capturedPhoto = localStorage.getItem('capturedPhoto');
+      if (!capturedPhoto) {
+        console.warn('No captured photo found');
+        // Could redirect back to capture page or show warning
+      }
+      
+      // Detect device type and provide guidance
+      detectDeviceType();
+      
+      // Auto-start location detection
+      getCurrentLocation();
+      
+      // Add input validation for manual location
+      const manualLocationEl = document.getElementById('manualLocation');
+      if (manualLocationEl) {
+        manualLocationEl.addEventListener('input', function() {
+          const value = this.value.trim();
+          if (value.length >= 3) {
+            this.classList.remove('error');
+            this.classList.add('success');
+          } else {
+            this.classList.remove('success');
+          }
+        });
+        
+        // Add some helpful placeholder examples
+        const examples = [
+          '123 Main Street, Downtown',
+          'Central Park, New York',
+          'Near City Hall, Main Road',
+          'Shopping Mall, Highway 101',
+          'University Campus, Science Building'
+        ];
+        const randomExample = examples[Math.floor(Math.random() * examples.length)];
+        manualLocationEl.placeholder = `e.g., ${randomExample}`;
+      }
+    };
+    
+    // Detect device type and provide guidance
+    function detectDeviceType() {
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const isHTTPS = location.protocol === 'https:';
+      
+      console.log('📱 Device detection:', {
+        userAgent: navigator.userAgent,
+        isMobile: isMobile,
+        isHTTPS: isHTTPS,
+        protocol: location.protocol
+      });
+      
+      if (isMobile) {
+        console.log('📱 Mobile device detected');
+        // Mobile-specific guidance could be added here
+      } else {
+        console.log('💻 Desktop device detected');
+        // Desktop-specific guidance could be added here
+      }
+      
+      if (!isHTTPS && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        console.warn('⚠️ Not running on HTTPS - location may be blocked');
+        // Could show a warning to the user
+      }
+    }
+    
+    // Comprehensive location test function
+    function runLocationTest() {
+      console.log('🧪 Starting comprehensive location test...');
+      
+      const results = {
+        browserSupport: 'unknown',
+        permissionStatus: 'unknown',
+        gpsAccuracy: 'unknown',
+        geocodingSuccess: 'unknown',
+        errors: []
+      };
+      
+      // Test 1: Browser Support
+      if ('geolocation' in navigator) {
+        results.browserSupport = 'supported';
+        console.log('✅ Test 1: Browser supports geolocation');
+      } else {
+        results.browserSupport = 'not supported';
+        results.errors.push('Browser does not support geolocation');
+        console.log('❌ Test 1: Browser does not support geolocation');
+      }
+      
+      // Test 2: HTTPS Check
+      const isHTTPS = location.protocol === 'https:';
+      const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+      if (isHTTPS || isLocalhost) {
+        console.log('✅ Test 2: HTTPS or localhost - location should work');
+      } else {
+        results.errors.push('Not running on HTTPS - location may be blocked');
+        console.log('⚠️ Test 2: Not running on HTTPS - location may be blocked');
+      }
+      
+      // Test 3: Try to get location
+      if (results.browserSupport === 'supported') {
+        console.log('🧪 Test 3: Attempting to get current location...');
+        
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            results.gpsAccuracy = position.coords.accuracy;
+            console.log('✅ Test 3: GPS location obtained successfully');
+            console.log('📍 Position:', {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              accuracy: position.coords.accuracy,
+              altitude: position.coords.altitude,
+              heading: position.coords.heading,
+              speed: position.coords.speed
+            });
+            
+            // Test 4: Try reverse geocoding
+            console.log('🧪 Test 4: Testing reverse geocoding...');
+            reverseGeocode(position.coords.latitude, position.coords.longitude)
+              .then(function(address) {
+                results.geocodingSuccess = 'success';
+                console.log('✅ Test 4: Reverse geocoding successful:', address);
+                
+                // Show test results
+                showTestResults(results);
+              })
+              .catch(function(error) {
+                results.geocodingSuccess = 'failed';
+                results.errors.push('Reverse geocoding failed: ' + error.message);
+                console.log('❌ Test 4: Reverse geocoding failed:', error);
+                showTestResults(results);
+              });
+          },
+          function(error) {
+            results.errors.push('GPS failed: ' + getGeolocationErrorMessage(error.code));
+            console.log('❌ Test 3: GPS location failed:', getGeolocationErrorMessage(error.code));
+            showTestResults(results);
+          },
+          { timeout: 10000, enableHighAccuracy: true }
+        );
+      } else {
+        showTestResults(results);
+      }
+    }
+    
+    // Show test results to user
+    function showTestResults(results) {
+      console.log('📊 Location Test Results:');
+      console.log('Browser Support:', results.browserSupport);
+      console.log('Permission Status:', results.permissionStatus);
+      console.log('GPS Accuracy:', results.gpsAccuracy);
+      console.log('Geocoding Success:', results.geocodingSuccess);
+      console.log('Errors:', results.errors);
+      
+      let summary = '<h4>🧪 Location Test Results</h4>';
+      summary += '<p><strong>Browser Support:</strong> ' + results.browserSupport + '</p>';
+      summary += '<p><strong>GPS Accuracy:</strong> ' + results.gpsAccuracy + '</p>';
+      summary += '<p><strong>Geocoding:</strong> ' + results.geocodingSuccess + '</p>';
+      
+      if (results.errors.length > 0) {
+        summary += '<p><strong>❌ Issues Found:</strong></p><ul>';
+        results.errors.forEach(function(error) {
+          summary += '<li>' + error + '</li>';
+        });
+        summary += '</ul>';
+      } else {
+        summary += '<p>✅ All tests passed!</p>';
+      }
+      
+      // Create a temporary results display
+      const resultsDiv = document.createElement('div');
+      resultsDiv.innerHTML = summary;
+      resultsDiv.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 2px solid #007bff; border-radius: 10px; z-index: 1000; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);';
+      
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = 'Close';
+      closeBtn.style.cssText = 'margin-top: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;';
+      closeBtn.onclick = function() { document.body.removeChild(resultsDiv); };
+      
+      resultsDiv.appendChild(closeBtn);
+      document.body.appendChild(resultsDiv);
+    }
+    
+    // Helper function to get geolocation error messages
+    function getGeolocationErrorMessage(errorCode) {
+      switch(errorCode) {
+        case 1: return 'Permission denied - check browser settings';
+        case 2: return 'Location unavailable - check device settings';
+        case 3: return 'Timeout - try again or move to better signal area';
+        default: return 'Unknown error';
+      }
+    }
+
+    function goBack() {
+      window.history.back();
+    }
+  </script>
+</body>
+</html>

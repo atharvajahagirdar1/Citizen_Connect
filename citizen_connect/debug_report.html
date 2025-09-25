@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug Report Issue - Citizen Connect</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: #f8fafb;
+      color: #1a1a1a;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .debug-section {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .debug-button {
+      background: #4285f4;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 5px;
+      transition: all 0.3s ease;
+    }
+    .debug-button:hover {
+      background: #3367d6;
+      transform: translateY(-1px);
+    }
+    .debug-button.danger {
+      background: #dc3545;
+    }
+    .debug-button.danger:hover {
+      background: #c82333;
+    }
+    .status {
+      padding: 10px;
+      border-radius: 6px;
+      margin: 10px 0;
+      font-family: monospace;
+      font-size: 14px;
+    }
+    .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    .data-preview {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 6px;
+      border-left: 4px solid #4285f4;
+      margin: 10px 0;
+      word-break: break-all;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .form-textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Debug Report Issue</h1>
+  
+  <div class="debug-section">
+    <h2>Step 1: Setup Test Environment</h2>
+    <button class="debug-button" onclick="setupTestEnvironment()">🧪 Setup Test Environment</button>
+    <div id="setupStatus" class="status info">Click to setup test environment</div>
+  </div>
+
+  <div class="debug-section">
+    <h2>Step 2: Test Submit Function</h2>
+    <button class="debug-button" onclick="testSubmitFunction()">🚀 Test Submit Function</button>
+    <div id="submitStatus" class="status info">Click to test submit function</div>
+  </div>
+
+  <div class="debug-section">
+    <h2>Step 3: Manual Form Test</h2>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-select" id="testCategory">
+        <option value="pothole">🕳️ Potholes & Road Damage</option>
+        <option value="streetlight">💡 Street Lighting</option>
+        <option value="garbage">🗑️ Garbage & Waste</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-textarea" id="testDescription" placeholder="Test description of the issue"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Priority</label>
+      <select class="form-select" id="testPriority">
+        <option value="low">🟢 Low</option>
+        <option value="medium">🟡 Medium</option>
+        <option value="high">🔴 High</option>
+        <option value="urgent">🚨 Urgent</option>
+      </select>
+    </div>
+    <button class="debug-button" onclick="testManualSubmit()">📝 Test Manual Submit</button>
+    <div id="manualStatus" class="status info">Fill form and test manual submit</div>
+  </div>
+
+  <div class="debug-section">
+    <h2>Step 4: Check Current Data</h2>
+    <button class="debug-button" onclick="checkCurrentData()">🔍 Check Current Data</button>
+    <div id="dataStatus" class="status info">Click to check current data</div>
+  </div>
+
+  <div class="debug-section">
+    <h2>Step 5: Clear All Data</h2>
+    <button class="debug-button danger" onclick="clearAllData()">🗑️ Clear All Data</button>
+    <div id="clearStatus" class="status info">Clear all test data</div>
+  </div>
+
+  <script>
+    // Global variables from Report Issue Page
+    let selectedPriority = 'medium';
+    let capturedPhoto = null;
+    let locationData = null;
+
+    // Copy the exact submitReport function from the Report Issue Page
+    function submitReport() {
+      console.log('🚀 Debug submitReport called');
+      
+      if (!validateForm()) {
+        console.log('❌ Form validation failed');
+        return false;
+      }
+
+      const submitBtn = document.getElementById('submitBtn');
+      const categorySelect = document.getElementById('categorySelect');
+      const descriptionText = document.getElementById('descriptionText');
+
+      try {
+        // Show loading state
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.classList.add('loading');
+          submitBtn.innerHTML = '<div class="spinner"></div> Submitting...';
+        }
+
+        // Prepare report data
+        const reportData = {
+          id: 'issue_' + Date.now(),
+          category: categorySelect ? categorySelect.value : document.getElementById('testCategory').value,
+          description: descriptionText ? descriptionText.value.trim() : document.getElementById('testDescription').value.trim(),
+          priority: selectedPriority || document.getElementById('testPriority').value,
+          location: document.getElementById('locationValue') ? document.getElementById('locationValue').textContent : 'Test Location',
+          locationData: locationData || JSON.parse(localStorage.getItem('reportLocation') || '{"address":"Test Location","lat":0,"lon":0}'),
+          photo: capturedPhoto || localStorage.getItem('capturedPhoto'),
+          timestamp: new Date().toISOString(),
+          status: 'Reported',
+          reporter: 'Citizen User'
+        };
+
+        console.log('📋 Report data prepared:', reportData);
+
+        // Save to user issues
+        const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+        userIssues.push(reportData);
+        localStorage.setItem('userIssues', JSON.stringify(userIssues));
+
+        console.log('✅ Report saved to userIssues:', userIssues.length, 'total issues');
+
+        // Clear temporary data
+        localStorage.removeItem('capturedPhoto');
+        localStorage.removeItem('reportLocation');
+        localStorage.removeItem('reportedIssueLocation');
+        localStorage.removeItem('photoTimestamp');
+
+        console.log('🧹 Temporary data cleared');
+
+        // Success
+        console.log('🎉 Report submitted successfully!');
+        return true;
+
+      } catch (error) {
+        console.error('❌ Error submitting report:', error);
+        
+        // Reset button state
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('loading');
+          submitBtn.innerHTML = '📤 Submit Report';
+        }
+        
+        alert('Error submitting report. Please try again.');
+        return false;
+      }
+    }
+
+    // Copy validation function
+    function validateForm() {
+      console.log('🔍 Validating form...');
+      
+      let isValid = true;
+      
+      // Clear previous errors
+      document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+      document.querySelectorAll('.error-message').forEach(el => el.remove());
+
+      // Validate category
+      const categorySelect = document.getElementById('categorySelect') || document.getElementById('testCategory');
+      if (!categorySelect.value) {
+        if (categorySelect.classList) {
+          categorySelect.classList.add('error');
+        }
+        console.log('❌ Category validation failed');
+        isValid = false;
+      } else {
+        console.log('✅ Category validated:', categorySelect.value);
+      }
+
+      // Validate description
+      const descriptionText = document.getElementById('descriptionText') || document.getElementById('testDescription');
+      const description = descriptionText.value.trim();
+      if (!description || description.length < 10) {
+        if (descriptionText.classList) {
+          descriptionText.classList.add('error');
+        }
+        console.log('❌ Description validation failed (length:', description.length, ')');
+        isValid = false;
+      } else {
+        console.log('✅ Description validated (length:', description.length, ')');
+      }
+
+      // Validate photo
+      const capturedPhoto = localStorage.getItem('capturedPhoto');
+      if (!capturedPhoto) {
+        console.log('❌ Photo validation failed - no photo found');
+        isValid = false;
+      } else {
+        console.log('✅ Photo validated (length:', capturedPhoto.length, ')');
+      }
+
+      console.log('✅ Form validation result:', isValid);
+      return isValid;
+    }
+
+    function setupTestEnvironment() {
+      try {
+        // Create test photo
+        const canvas = document.createElement('canvas');
+        canvas.width = 100;
+        canvas.height = 100;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ff0000';
+        ctx.fillRect(0, 0, 100, 100);
+        const testPhoto = canvas.toDataURL('image/png');
+        
+        // Create test location
+        const testLocation = {
+          address: "123 Test Street, Test City, TC 12345",
+          lat: 40.7128,
+          lon: -74.0060,
+          manual: false,
+          timestamp: new Date().toISOString()
+        };
+        
+        // Store test data
+        localStorage.setItem('capturedPhoto', testPhoto);
+        localStorage.setItem('photoTimestamp', new Date().toISOString());
+        localStorage.setItem('reportLocation', JSON.stringify(testLocation));
+        localStorage.setItem('reportedIssueLocation', testLocation.address);
+        
+        document.getElementById('setupStatus').innerHTML = `
+          <div class="success">✅ Test environment setup complete!</div>
+          <div class="data-preview">
+            📸 Photo: ${testPhoto.length} characters<br>
+            📍 Location: ${testLocation.address}<br>
+            🕐 Timestamp: ${new Date().toISOString()}
+          </div>
+        `;
+        
+        console.log('✅ Test environment setup complete');
+        
+      } catch (error) {
+        document.getElementById('setupStatus').innerHTML = `
+          <div class="error">❌ Error setting up test environment: ${error.message}</div>
+        `;
+        console.error('Setup error:', error);
+      }
+    }
+
+    function testSubmitFunction() {
+      try {
+        console.log('🧪 Testing submit function...');
+        
+        // Check if we have required data
+        const photo = localStorage.getItem('capturedPhoto');
+        const location = localStorage.getItem('reportedIssueLocation');
+        
+        if (!photo) {
+          document.getElementById('submitStatus').innerHTML = `
+            <div class="error">❌ No photo data found. Please setup test environment first.</div>
+          `;
+          return;
+        }
+        
+        if (!location) {
+          document.getElementById('submitStatus').innerHTML = `
+            <div class="error">❌ No location data found. Please setup test environment first.</div>
+          `;
+          return;
+        }
+        
+        // Test the submit function
+        const result = submitReport();
+        
+        if (result) {
+          document.getElementById('submitStatus').innerHTML = `
+            <div class="success">✅ Submit function test passed!</div>
+            <div class="data-preview">Report submitted successfully</div>
+          `;
+        } else {
+          document.getElementById('submitStatus').innerHTML = `
+            <div class="error">❌ Submit function test failed.</div>
+          `;
+        }
+        
+      } catch (error) {
+        document.getElementById('submitStatus').innerHTML = `
+          <div class="error">❌ Error testing submit function: ${error.message}</div>
+        `;
+        console.error('Submit test error:', error);
+      }
+    }
+
+    function testManualSubmit() {
+      try {
+        console.log('🧪 Testing manual submit...');
+        
+        // Check if we have required data
+        const photo = localStorage.getItem('capturedPhoto');
+        const location = localStorage.getItem('reportedIssueLocation');
+        
+        if (!photo) {
+          document.getElementById('manualStatus').innerHTML = `
+            <div class="error">❌ No photo data found. Please setup test environment first.</div>
+          `;
+          return;
+        }
+        
+        if (!location) {
+          document.getElementById('manualStatus').innerHTML = `
+            <div class="error">❌ No location data found. Please setup test environment first.</div>
+          `;
+          return;
+        }
+        
+        // Get form values
+        const category = document.getElementById('testCategory').value;
+        const description = document.getElementById('testDescription').value.trim();
+        const priority = document.getElementById('testPriority').value;
+        
+        if (!category || !description || description.length < 10) {
+          document.getElementById('manualStatus').innerHTML = `
+            <div class="error">❌ Please fill all fields properly. Description needs at least 10 characters.</div>
+          `;
+          return;
+        }
+        
+        // Test the submit function
+        const result = submitReport();
+        
+        if (result) {
+          document.getElementById('manualStatus').innerHTML = `
+            <div class="success">✅ Manual submit test passed!</div>
+            <div class="data-preview">
+              Category: ${category}<br>
+              Description: ${description}<br>
+              Priority: ${priority}
+            </div>
+          `;
+        } else {
+          document.getElementById('manualStatus').innerHTML = `
+            <div class="error">❌ Manual submit test failed.</div>
+          `;
+        }
+        
+      } catch (error) {
+        document.getElementById('manualStatus').innerHTML = `
+          <div class="error">❌ Error testing manual submit: ${error.message}</div>
+        `;
+        console.error('Manual submit test error:', error);
+      }
+    }
+
+    function checkCurrentData() {
+      try {
+        const photo = localStorage.getItem('capturedPhoto');
+        const location = localStorage.getItem('reportedIssueLocation');
+        const locationData = localStorage.getItem('reportLocation');
+        const photoTimestamp = localStorage.getItem('photoTimestamp');
+        
+        let status = '<div class="info">📊 Current localStorage Data:</div>';
+        
+        if (photo) {
+          status += `<div class="data-preview">✅ Photo: Available (${photo.length} characters)<br>Timestamp: ${photoTimestamp || 'N/A'}</div>`;
+        } else {
+          status += '<div class="error">❌ Photo: Not found</div>';
+        }
+        
+        if (location) {
+          status += `<div class="data-preview">✅ Location: ${location}</div>`;
+        } else {
+          status += '<div class="error">❌ Location: Not found</div>';
+        }
+        
+        if (locationData) {
+          const parsed = JSON.parse(locationData);
+          status += `<div class="data-preview">✅ Location Data: ${parsed.address}</div>`;
+        } else {
+          status += '<div class="error">❌ Location Data: Not found</div>';
+        }
+        
+        // Check for existing issues
+        const userIssues = localStorage.getItem('userIssues');
+        if (userIssues) {
+          const issues = JSON.parse(userIssues);
+          status += `<div class="data-preview">📋 Existing Issues: ${issues.length} reports</div>`;
+        } else {
+          status += '<div class="info">📋 Existing Issues: None</div>';
+        }
+        
+        document.getElementById('dataStatus').innerHTML = status;
+        
+      } catch (error) {
+        document.getElementById('dataStatus').innerHTML = `
+          <div class="error">❌ Error checking data: ${error.message}</div>
+        `;
+        console.error('Data check error:', error);
+      }
+    }
+
+    function clearAllData() {
+      try {
+        localStorage.removeItem('capturedPhoto');
+        localStorage.removeItem('photoTimestamp');
+        localStorage.removeItem('reportLocation');
+        localStorage.removeItem('reportedIssueLocation');
+        localStorage.removeItem('userIssues');
+        
+        document.getElementById('clearStatus').innerHTML = `
+          <div class="success">✅ All test data cleared successfully!</div>
+        `;
+        
+        console.log('✅ All test data cleared');
+        
+      } catch (error) {
+        document.getElementById('clearStatus').innerHTML = `
+          <div class="error">❌ Error clearing data: ${error.message}</div>
+        `;
+        console.error('Clear data error:', error);
+      }
+    }
+
+    // Initialize on load
+    window.onload = function() {
+      checkCurrentData();
+    };
+  </script>
+</body>
+</html>

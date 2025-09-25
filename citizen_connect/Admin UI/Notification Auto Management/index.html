@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Auto Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="notification-management-container">
+        <!-- Header -->
+        <header class="notification-header">
+            <div class="header-content">
+                <div class="header-title">
+                    <button class="back-button" onclick="goBack()">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <i class="fas fa-bell"></i>
+                    <h1>Notification Auto Management System</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="showCreateRuleModal()">
+                        <i class="fas fa-plus"></i> Create New Rule
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportRules()">
+                        <i class="fas fa-download"></i> Export Rules
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="notification-main">
+            <!-- Dashboard Overview -->
+            <section class="dashboard-section">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon active">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3>Active Rules</h3>
+                            <div class="metric-value" id="activeRulesCount">12</div>
+                            <div class="metric-change positive">+2 this week</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon sent">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3>Notifications Sent</h3>
+                            <div class="metric-value" id="notificationsSentCount">1,247</div>
+                            <div class="metric-change positive">+15% this month</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3>Success Rate</h3>
+                            <div class="metric-value" id="successRate">98.5%</div>
+                            <div class="metric-change positive">+0.3% this week</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon failed">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3>Failed Attempts</h3>
+                            <div class="metric-value" id="failedAttemptsCount">19</div>
+                            <div class="metric-change negative">-5 this week</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notification Rules Management -->
+            <section class="rules-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-cogs"></i> Notification Rules</h2>
+                    <div class="section-controls">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="ruleSearch" placeholder="Search rules..." onkeyup="filterRules()">
+                        </div>
+                        <select id="statusFilter" onchange="filterRules()">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="draft">Draft</option>
+                        </select>
+                        <select id="categoryFilter" onchange="filterRules()">
+                            <option value="">All Categories</option>
+                            <option value="issue-report">Issue Report</option>
+                            <option value="status-update">Status Update</option>
+                            <option value="assignment">Assignment</option>
+                            <option value="reminder">Reminder</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="rules-container" id="rulesContainer">
+                    <!-- Rules will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Notification Templates -->
+            <section class="templates-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-file-text"></i> Message Templates</h2>
+                    <button class="btn btn-outline" onclick="showTemplateModal()">
+                        <i class="fas fa-plus"></i> New Template
+                    </button>
+                </div>
+
+                <div class="templates-grid" id="templatesGrid">
+                    <!-- Templates will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Notification History -->
+            <section class="history-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-history"></i> Recent Notifications</h2>
+                    <div class="section-controls">
+                        <div class="date-filter">
+                            <input type="date" id="startDate" onchange="filterHistory()">
+                            <span>to</span>
+                            <input type="date" id="endDate" onchange="filterHistory()">
+                        </div>
+                        <button class="btn btn-outline" onclick="clearHistory()">
+                            <i class="fas fa-trash"></i> Clear History
+                        </button>
+                    </div>
+                </div>
+
+                <div class="history-container" id="historyContainer">
+                    <!-- History will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Analytics Dashboard -->
+            <section class="analytics-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-line"></i> Analytics & Insights</h2>
+                    <div class="analytics-controls">
+                        <select id="analyticsTimeframe" onchange="updateAnalytics()">
+                            <option value="7d">Last 7 Days</option>
+                            <option value="30d" selected>Last 30 Days</option>
+                            <option value="90d">Last 90 Days</option>
+                            <option value="1y">Last Year</option>
+                        </select>
+                        <button class="btn btn-outline" onclick="exportAnalytics()">
+                            <i class="fas fa-download"></i> Export Report
+                        </button>
+                    </div>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>Notification Volume by Day</h3>
+                        <canvas id="volumeChart"></canvas>
+                    </div>
+                    <div class="analytics-card">
+                        <h3>Success Rate by Category</h3>
+                        <canvas id="successRateChart"></canvas>
+                    </div>
+                    <div class="analytics-card">
+                        <h3>Response Time Analysis</h3>
+                        <canvas id="responseTimeChart"></canvas>
+                    </div>
+                    <div class="analytics-card">
+                        <h3>User Engagement</h3>
+                        <canvas id="engagementChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Create/Edit Rule Modal -->
+    <div id="ruleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Create Notification Rule</h3>
+                <button class="close-btn" onclick="closeRuleModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="ruleForm">
+                    <div class="form-section">
+                        <h4><i class="fas fa-info-circle"></i> Rule Information</h4>
+                        <div class="form-group">
+                            <label for="ruleName">Rule Name *</label>
+                            <input type="text" id="ruleName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ruleDescription">Description</label>
+                            <textarea id="ruleDescription" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="ruleCategory">Category *</label>
+                            <select id="ruleCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="issue-report">Issue Report</option>
+                                <option value="status-update">Status Update</option>
+                                <option value="assignment">Assignment</option>
+                                <option value="reminder">Reminder</option>
+                                <option value="escalation">Escalation</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="rulePriority">Priority *</label>
+                            <select id="rulePriority" required>
+                                <option value="">Select Priority</option>
+                                <option value="critical">Critical</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4><i class="fas fa-filter"></i> Trigger Conditions</h4>
+                        <div class="condition-builder" id="conditionBuilder">
+                            <div class="condition-row">
+                                <select class="condition-field">
+                                    <option value="">Select Field</option>
+                                    <option value="issue-status">Issue Status</option>
+                                    <option value="priority">Priority</option>
+                                    <option value="category">Category</option>
+                                    <option value="assigned-to">Assigned To</option>
+                                    <option value="location">Location</option>
+                                    <option value="time-elapsed">Time Elapsed</option>
+                                </select>
+                                <select class="condition-operator">
+                                    <option value="equals">Equals</option>
+                                    <option value="not-equals">Not Equals</option>
+                                    <option value="contains">Contains</option>
+                                    <option value="greater-than">Greater Than</option>
+                                    <option value="less-than">Less Than</option>
+                                </select>
+                                <input type="text" class="condition-value" placeholder="Value">
+                                <button type="button" class="btn-icon" onclick="addCondition()">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4><i class="fas fa-users"></i> Recipients</h4>
+                        <div class="recipient-types">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="notifyReporter" checked>
+                                <span class="checkmark"></span>
+                                Issue Reporter
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="notifyAssignee">
+                                <span class="checkmark"></span>
+                                Assigned Worker
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="notifySupervisor">
+                                <span class="checkmark"></span>
+                                Supervisor
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="notifyAdmin">
+                                <span class="checkmark"></span>
+                                Admin Team
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4><i class="fas fa-envelope"></i> Message Configuration</h4>
+                        <div class="form-group">
+                            <label for="messageTemplate">Message Template *</label>
+                            <select id="messageTemplate" required>
+                                <option value="">Select Template</option>
+                                <option value="issue-created">Issue Created</option>
+                                <option value="status-changed">Status Changed</option>
+                                <option value="assigned-to">Assigned to Worker</option>
+                                <option value="reminder">Reminder</option>
+                                <option value="escalation">Escalation</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="deliveryChannel">Delivery Channel *</label>
+                            <select id="deliveryChannel" required>
+                                <option value="">Select Channel</option>
+                                <option value="email">Email</option>
+                                <option value="sms">SMS</option>
+                                <option value="push">Push Notification</option>
+                                <option value="in-app">In-App</option>
+                                <option value="all">All Channels</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="delayMinutes">Delay (minutes)</label>
+                            <input type="number" id="delayMinutes" min="0" value="0">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4><i class="fas fa-cog"></i> Advanced Settings</h4>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="enableRetry" checked>
+                                <span class="checkmark"></span>
+                                Enable Retry on Failure
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxRetries">Maximum Retries</label>
+                            <input type="number" id="maxRetries" min="0" max="5" value="3">
+                        </div>
+                        <div class="form-group">
+                            <label for="retryDelay">Retry Delay (minutes)</label>
+                            <input type="number" id="retryDelay" min="1" value="15">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Rule
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeRuleModal()">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Modal -->
+    <div id="templateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Message Template Editor</h3>
+                <button class="close-btn" onclick="closeTemplateModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="templateForm">
+                    <div class="form-group">
+                        <label for="templateName">Template Name *</label>
+                        <input type="text" id="templateName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="templateSubject">Subject Line *</label>
+                        <input type="text" id="templateSubject" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="templateContent">Message Content *</label>
+                        <textarea id="templateContent" rows="6" required></textarea>
+                    </div>
+                    <div class="template-variables">
+                        <h4>Available Variables:</h4>
+                        <div class="variable-tags">
+                            <span class="variable-tag" onclick="insertVariable('{issue_id}')">{issue_id}</span>
+                            <span class="variable-tag" onclick="insertVariable('{issue_title}')">{issue_title}</span>
+                            <span class="variable-tag" onclick="insertVariable('{issue_description}')">{issue_description}</span>
+                            <span class="variable-tag" onclick="insertVariable('{issue_location}')">{issue_location}</span>
+                            <span class="variable-tag" onclick="insertVariable('{issue_priority}')">{issue_priority}</span>
+                            <span class="variable-tag" onclick="insertVariable('{issue_status}')">{issue_status}</span>
+                            <span class="variable-tag" onclick="insertVariable('{assigned_worker}')">{assigned_worker}</span>
+                            <span class="variable-tag" onclick="insertVariable('{reporter_name}')">{reporter_name}</span>
+                            <span class="variable-tag" onclick="insertVariable('{completion_date}')">{completion_date}</span>
+                            <span class="variable-tag" onclick="insertVariable('{current_date}')">{current_date}</span>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Template
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeTemplateModal()">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rule Test Modal -->
+    <div id="testModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Test Notification Rule</h3>
+                <button class="close-btn" onclick="closeTestModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="test-scenario">
+                    <h4>Test Scenario</h4>
+                    <div class="scenario-builder">
+                        <div class="form-group">
+                            <label>Issue Status</label>
+                            <select id="testIssueStatus">
+                                <option value="reported">Reported</option>
+                                <option value="assigned">Assigned</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="resolved">Resolved</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Priority</label>
+                            <select id="testPriority">
+                                <option value="critical">Critical</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="testCategory">
+                                <option value="infrastructure">Infrastructure</option>
+                                <option value="sanitation">Sanitation</option>
+                                <option value="traffic">Traffic</option>
+                                <option value="environment">Environment</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="runRuleTest()">
+                        <i class="fas fa-play"></i> Run Test
+                    </button>
+                </div>
+                <div class="test-results" id="testResults" style="display: none;">
+                    <h4>Test Results</h4>
+                    <div class="test-summary">
+                        <div class="test-status" id="testStatus"></div>
+                        <div class="test-details" id="testDetails"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Session management
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            
+            // Add logout functionality to header
+            const headerActions = document.querySelector('.header-actions');
+            const logoutBtn = document.createElement('button');
+            logoutBtn.className = 'btn btn-danger';
+            logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+            logoutBtn.onclick = logout;
+            headerActions.appendChild(logoutBtn);
+        });
+
+        function checkAuthentication() {
+            const adminData = localStorage.getItem('adminData');
+            if (!adminData) {
+                window.location.href = '../Login/index.html';
+                return;
+            }
+            
+            // Parse the admin data and check if user is logged in
+            const admin = JSON.parse(adminData);
+            if (!admin.isLoggedIn) {
+                window.location.href = '../Login/index.html';
+                return;
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Remove the isLoggedIn flag but keep other data
+                const adminData = localStorage.getItem('adminData');
+                if (adminData) {
+                    const admin = JSON.parse(adminData);
+                    admin.isLoggedIn = false;
+                    localStorage.setItem('adminData', JSON.stringify(admin));
+                }
+                window.location.href = '../Login/index.html';
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        // Add some CSS for the logout button
+        const style = document.createElement('style');
+        style.textContent = `
+            .btn-danger {
+                background: linear-gradient(135deg, #dc3545, #c82333);
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                margin-left: 10px;
+            }
+            .btn-danger:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 15px rgba(220, 53, 69, 0.4);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
