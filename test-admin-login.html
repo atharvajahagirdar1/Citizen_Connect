@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Admin Login</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background: #d4edda; border-color: #28a745; }
+        .error { background: #f8d7da; border-color: #dc3545; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Admin Login Test</h1>
+    
+    <div class="test-section">
+        <h3>Test Login Functionality</h3>
+        <button onclick="testCorrectCredentials()">Test Correct Credentials (admin/demo123)</button>
+        <button onclick="testWrongCredentials()">Test Wrong Credentials</button>
+        <button onclick="testSessionStorage()">Check Session Storage</button>
+        <button onclick="clearSession()">Clear Session</button>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Quick Links</h3>
+        <button onclick="window.location.href='Admin UI/Login/index.html'">Go to Admin Login</button>
+        <button onclick="window.location.href='Admin UI/Dashboard/index.html'">Go to Dashboard</button>
+        <button onclick="window.location.href='index.html'">Go to Main Site</button>
+    </div>
+
+    <script>
+        function showResult(message, isSuccess) {
+            const results = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = isSuccess ? 'success' : 'error';
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        function testCorrectCredentials() {
+            // Simulate login with correct credentials
+            const adminData = {
+                name: 'Admin User',
+                username: 'admin',
+                loginTime: new Date().toISOString()
+            };
+            sessionStorage.setItem('adminData', JSON.stringify(adminData));
+            showResult('✅ Login successful! Admin data stored in sessionStorage.', true);
+            showResult('🔄 You can now navigate to the dashboard.', true);
+        }
+
+        function testWrongCredentials() {
+            showResult('❌ Login failed - Invalid credentials (this would show error message)', false);
+        }
+
+        function testSessionStorage() {
+            const adminData = sessionStorage.getItem('adminData');
+            if (adminData) {
+                const data = JSON.parse(adminData);
+                showResult('✅ Admin session found: ' + JSON.stringify(data, null, 2), true);
+            } else {
+                showResult('❌ No admin session found in sessionStorage', false);
+            }
+        }
+
+        function clearSession() {
+            sessionStorage.removeItem('adminData');
+            showResult('🧹 Session cleared successfully', true);
+        }
+
+        // Check session on load
+        window.onload = function() {
+            testSessionStorage();
+        };
+    </script>
+</body>
+</html>

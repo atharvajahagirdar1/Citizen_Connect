@@ -114,6 +114,43 @@
     .back-link:hover {
       text-decoration: underline;
     }
+
+    .error-message {
+      color: #dc3545;
+      background: #f8d7da;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 15px;
+      display: none;
+      font-size: 14px;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      z-index: 1000;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      max-width: 300px;
+    }
+
+    .notification-success {
+      background: #28a745;
+    }
+
+    .notification-error {
+      background: #dc3545;
+    }
+
+    .notification-warning {
+      background: #ffc107;
+      color: #212529;
+    }
   </style>
 </head>
 <body>
@@ -132,6 +169,7 @@
         <input type="password" id="password" placeholder="Enter admin password" required>
       </div>
       <button type="submit" class="btn">Access Dashboard</button>
+      <div id="error-message" class="error-message"></div>
     </form>
 
     <div class="demo-credentials">
@@ -164,7 +202,7 @@
         
         showNotification('Login successful! Redirecting to dashboard...', 'success');
         setTimeout(() => {
-          window.location.href = '/dashboard';
+          window.location.href = '../Dashboard/index.html';
         }, 1500);
       } else {
         document.getElementById('error-message').textContent = 'Invalid username or password';
@@ -177,10 +215,7 @@
     function showNotification(message, type = 'info') {
       const notification = document.createElement('div');
       notification.className = `notification notification-${type}`;
-      notification.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check' : type === 'warning' ? 'exclamation-triangle' : type === 'error' ? 'times-circle' : 'info'}-circle"></i>
-        ${message}
-      `;
+      notification.textContent = message;
       
       document.body.appendChild(notification);
       
@@ -197,32 +232,6 @@
         }, 300);
       }, 5000);
     }
-
-    // Add notification styles
-    const style = document.createElement('style');
-    style.textContent = `
-      .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: 8px;
-        color: white;
-        font-weight: 600;
-        z-index: 10000;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      }
-      .notification-success { background: #28a745; }
-      .notification-warning { background: #ffc107; color: #333; }
-      .notification-error { background: #dc3545; }
-      .notification-info { background: #1565d8; }
-    `;
-    document.head.appendChild(style);
   </script>
 </body>
 </html>
