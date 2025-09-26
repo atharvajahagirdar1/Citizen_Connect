@@ -316,22 +316,22 @@
 
     <!-- Navigation Cards -->
     <div class="nav-cards">
-      <div class="nav-card" onclick="window.location.href='/civic-issues'">
+      <div class="nav-card" onclick="window.location.href='../Civic Issue Management Portal/index.html'">
         <div class="nav-icon">🚨</div>
         <h3>Civic Issues Management</h3>
         <p>Manage and track civic issues reported by citizens</p>
       </div>
-      <div class="nav-card" onclick="window.location.href='/notifications'">
+      <div class="nav-card" onclick="window.location.href='../Notification Auto Management/index.html'">
         <div class="nav-icon">🔔</div>
         <h3>Notification Management</h3>
         <p>Automated notification system for issue updates</p>
       </div>
-      <div class="nav-card" onclick="window.location.href='/reports'">
+      <div class="nav-card" onclick="window.location.href='../Reports and Analysis/index.html'">
         <div class="nav-icon">📊</div>
         <h3>Reports & Analytics</h3>
         <p>Comprehensive reporting and data analytics</p>
       </div>
-      <div class="nav-card" onclick="window.location.href='/workers'">
+      <div class="nav-card" onclick="window.location.href='../Worker or Volenteer Management/index.html'">
         <div class="nav-icon">👥</div>
         <h3>Worker Management</h3>
         <p>Manage workers, schedules, and task assignments</p>
@@ -661,7 +661,7 @@ Date: ${formatDate(issue.timestamp)}`);
       
       if (!adminData) {
         console.log('No admin data found, redirecting to login');
-        window.location.href = '/login';
+        window.location.href = '../Login/index.html';
         return false;
       }
       
@@ -674,7 +674,7 @@ Date: ${formatDate(issue.timestamp)}`);
 
     function logout() {
       sessionStorage.removeItem('adminData');
-      window.location.href = '/login';
+      window.location.href = '../Login/index.html';
     }
 
     // Check authentication on page load

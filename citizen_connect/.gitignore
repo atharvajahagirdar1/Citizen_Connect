@@ -1,21 +1,23 @@
 # Dependencies
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+**/node_modules/
+package-lock.json
+**/package-lock.json
 
-# Admin UI dependencies (specifically exclude)
-Admin UI/node_modules/
-Admin UI/package-lock.json
+# Logs
+*.log
+npm-debug.log*
 
 # Runtime data
 pids
 *.pid
 *.seed
-*.pid.lock
 
 # Coverage directory used by tools like istanbul
-coverage/
+coverage
+
+# Compiled binary addons
+build/Release
 
 # Dependency directories
 jspm_packages/
@@ -32,19 +34,14 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
-# Environment variables
+# dotenv environment variables file
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
 # IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
 # OS generated files
 .DS_Store
@@ -55,14 +52,18 @@ jspm_packages/
 ehthumbs.db
 Thumbs.db
 
-# Logs
-logs
-*.log
+# GitHub Pages specific - prevent Jekyll from processing these
+**/*.md
+!README.md
+!Admin UI/README.md
 
-# Data files (if any generated)
-*.json
-!package*.json
+# Test files
+test_*.html
+debug_*.html
+complete_test.html
+verify_main_ui.html
 
-# Temporary files
-tmp/
-temp/
+# Server files (not needed for GitHub Pages)
+server.js
+simple_server.js
+create_test_data.js

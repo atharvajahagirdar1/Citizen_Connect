@@ -24,7 +24,7 @@
         });
 
         function checkAuthentication() {
-            const adminData = localStorage.getItem('adminData');
+            const adminData = sessionStorage.getItem('adminData');
             if (!adminData) {
                 window.location.href = '../Login/index.html';
                 return;
@@ -32,7 +32,7 @@
             
             // Parse the admin data and check if user is logged in
             const admin = JSON.parse(adminData);
-            if (!admin.isLoggedIn) {
+            if (!admin.loginTime) {
                 window.location.href = '../Login/index.html';
                 return;
             }
@@ -40,13 +40,7 @@
 
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
-                // Remove the isLoggedIn flag but keep other data
-                const adminData = localStorage.getItem('adminData');
-                if (adminData) {
-                    const admin = JSON.parse(adminData);
-                    admin.isLoggedIn = false;
-                    localStorage.setItem('adminData', JSON.stringify(admin));
-                }
+                sessionStorage.removeItem('adminData');
                 window.location.href = '../Login/index.html';
             }
         }

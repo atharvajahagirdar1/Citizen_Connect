@@ -196,6 +196,37 @@
     </div>
 
     <script>
+      // Session management
+      document.addEventListener('DOMContentLoaded', function() {
+        checkAuthentication();
+        
+        // Add logout functionality
+        const logoutBtn = document.querySelector('.logout-btn');
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to logout?')) {
+              sessionStorage.removeItem('adminData');
+              window.location.href = '../Login/index.html';
+            }
+          });
+        }
+      });
+
+      function checkAuthentication() {
+        const adminData = sessionStorage.getItem('adminData');
+        if (!adminData) {
+          window.location.href = '../Login/index.html';
+          return;
+        }
+        
+        // Parse the admin data and check if user is logged in
+        const admin = JSON.parse(adminData);
+        if (!admin.loginTime) {
+          window.location.href = '../Login/index.html';
+          return;
+        }
+      }
+
       // Modal toggle JS
       const addTaskBtn = document.getElementById('addTaskBtn');
       const modal = document.getElementById('taskModal');
