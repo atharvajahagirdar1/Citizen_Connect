@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Issues - Citizen Connect</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #f0f7ff, #ffffff);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 430px;
+      margin: auto;
+      min-height: 100vh;
+      background: white;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      background: white;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .back-btn {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      margin-right: 15px;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    /* Stats Section */
+    .stats {
+      display: flex;
+      padding: 20px 15px;
+      gap: 15px;
+    }
+
+    .stat-card {
+      flex: 1;
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .stat-number {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1565d8;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    /* Filter Buttons */
+    .filters {
+      display: flex;
+      padding: 0 15px 15px 15px;
+      gap: 10px;
+    }
+
+    .filter-btn {
+      padding: 8px 16px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      background: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .filter-btn.active {
+      background: #1565d8;
+      color: white;
+      border-color: #1565d8;
+    }
+
+    .filter-btn:hover {
+      background: #fff3cd;
+      border-color: #ffc107;
+    }
+
+    /* Issues List */
+    .issues-list {
+      padding: 15px;
+    }
+
+    .issue-card {
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: transform 0.2s;
+    }
+
+    .issue-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+
+    .issue-card {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      cursor: pointer;
+    }
+
+    .issue-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #f5f5f5;
+    }
+
+    .issue-content {
+      flex: 1;
+    }
+
+    .issue-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .issue-status {
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-reported { background: #e8f0ff; color: #1565d8; }
+    .status-progress { background: #fff3d6; color: #f59e0b; }
+    .status-resolved { background: #e1f8e7; color: #28a745; }
+
+    .issue-likes {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+
+    .empty-state img {
+      width: 80px;
+      opacity: 0.5;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <img src="https://img.icons8.com/ios-filled/50/back.png" alt="Back" class="back-btn" onclick="goBack()">
+      <h1>My Issues</h1>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-number" id="totalIssues">0</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="pendingIssues">0</div>
+        <div class="stat-label">Pending</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="resolvedIssues">0</div>
+        <div class="stat-label">Resolved</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="Reported">Reported</button>
+      <button class="filter-btn" data-filter="In Progress">In Progress</button>
+      <button class="filter-btn" data-filter="Resolved">Resolved</button>
+    </div>
+
+    <!-- Issues List -->
+    <div class="issues-list" id="issuesList">
+      <!-- Issues will be populated by JavaScript -->
+    </div>
+  </div>
+
+  <script>
+    let allIssues = [];
+    let currentFilter = 'all';
+
+    // Load issues from localStorage
+    function loadIssues() {
+      allIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+      
+      // Add some demo issues if none exist
+      if (allIssues.length === 0) {
+        allIssues = [
+          {
+            id: 'demo1',
+            location: '123 Main Street, Downtown',
+            description: 'Large pothole causing traffic issues',
+            status: 'Resolved',
+            timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            image: 'data:image/png;base64,placeholder'
+          },
+          {
+            id: 'demo2',
+            location: 'Park Avenue & 5th Street',
+            description: 'Broken streetlight - safety concern',
+            status: 'In Progress',
+            timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+            image: 'data:image/png;base64,placeholder'
+          },
+          {
+            id: 'demo3',
+            location: 'Community Park Entrance',
+            description: 'Garbage overflow near park entrance',
+            status: 'Reported',
+            timestamp: new Date().toISOString(),
+            image: 'data:image/png;base64,placeholder'
+          }
+        ];
+        localStorage.setItem('userIssues', JSON.stringify(allIssues));
+      }
+      
+      updateStats();
+      displayIssues();
+    }
+
+    // Update statistics
+    function updateStats() {
+      const total = allIssues.length;
+      const pending = allIssues.filter(issue => issue.status !== 'Resolved').length;
+      const resolved = allIssues.filter(issue => issue.status === 'Resolved').length;
+      
+      document.getElementById('totalIssues').textContent = total;
+      document.getElementById('pendingIssues').textContent = pending;
+      document.getElementById('resolvedIssues').textContent = resolved;
+    }
+
+    // Display issues based on current filter
+    function displayIssues() {
+      const issuesList = document.getElementById('issuesList');
+      const filteredIssues = currentFilter === 'all' 
+        ? allIssues 
+        : allIssues.filter(issue => issue.status === currentFilter);
+      
+      if (filteredIssues.length === 0) {
+        issuesList.innerHTML = `
+          <div class="empty-state">
+            <img src="https://img.icons8.com/ios/100/search--v1.png" alt="Empty">
+            <p>No issues found</p>
+            <p style="font-size: 12px; margin-top: 5px;">Start reporting civic issues to help your community!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      issuesList.innerHTML = filteredIssues.map(issue => `
+        <div class="issue-card" onclick="viewIssueDetails('${issue.id}')">
+          ${issue.image && issue.image.startsWith('data:image/') ? 
+            `<img src="${issue.image}" alt="Issue" class="issue-avatar">` :
+            '<div class="issue-avatar" style="background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; border-radius: 50%;">📷</div>'
+          }
+          <div class="issue-content">
+            <div class="issue-title">${issue.description || 'Issue reported from location'}</div>
+            <span class="issue-status status-${issue.status.toLowerCase().replace(' ', '')}">${getStatusIcon(issue.status)} ${issue.status}</span>
+          </div>
+          <div class="issue-likes">
+            👍 <span>${Math.floor(Math.random() * 5) + 1}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // View issue details function
+    function viewIssueDetails(issueId) {
+      // Navigate to Report Details page with issue ID
+      window.location.href = `../Report Details Page/index.html?id=${issueId}`;
+    }
+
+    function getStatusIcon(status) {
+      switch(status) {
+        case 'Reported': return '🔴';
+        case 'In Progress': return '🟡';
+        case 'Resolved': return '🟢';
+        default: return '🔴';
+      }
+    }
+
+    // Filter functionality
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelector('.filter-btn.active').classList.remove('active');
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        displayIssues();
+      });
+    });
+
+    // Simulate status update for demo purposes
+    function simulateStatusUpdate(issueId) {
+      const issue = allIssues.find(i => i.id === issueId);
+      if (!issue) return;
+      
+      // Update issue status
+      const statusProgression = {
+        'Reported': 'In Progress',
+        'In Progress': 'Resolved'
+      };
+      
+      const newStatus = statusProgression[issue.status];
+      if (newStatus) {
+        issue.status = newStatus;
+        
+        // Save updated issues
+        localStorage.setItem('userIssues', JSON.stringify(allIssues));
+        
+        // Create notification for status update
+        addStatusUpdateNotification(issue, newStatus);
+        
+        // Refresh display
+        updateStats();
+        displayIssues();
+        
+        alert(`Issue status updated to: ${newStatus}\nCheck your notifications for more details!`);
+      }
+    }
+    
+    // Add notification for status updates
+    function addStatusUpdateNotification(issue, newStatus) {
+      const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+      
+      const statusMessages = {
+        'In Progress': `Your issue report "${issue.description.substring(0, 40)}..." is now being reviewed and work will begin soon.`,
+        'Resolved': `Great news! Your issue report "${issue.description.substring(0, 40)}..." has been successfully resolved by the municipal team.`
+      };
+      
+      const statusIcons = {
+        'In Progress': '🔄',
+        'Resolved': '✅'
+      };
+      
+      const newNotification = {
+        id: Date.now().toString(),
+        type: newStatus === 'Resolved' ? 'resolved' : 'update',
+        title: `Issue ${newStatus}`,
+        message: statusMessages[newStatus] || `Your issue status has been updated to ${newStatus}.`,
+        time: new Date(),
+        read: false,
+        icon: statusIcons[newStatus] || '📋',
+        priority: newStatus === 'Resolved' ? 'high' : 'medium'
+      };
+      
+      notifications.unshift(newNotification);
+      localStorage.setItem('notifications', JSON.stringify(notifications));
+      
+      // Update notification badge count
+      const unreadCount = notifications.filter(n => !n.read).length;
+      localStorage.setItem('unreadNotificationCount', unreadCount.toString());
+    }
+
+    // Navigation
+    function goBack() {
+      window.location.href = '../Main UI/index.html';
+    }
+    
+    // Initialize
+    window.onload = function() {
+      // Initialize language system
+      if (typeof window.languageManager !== 'undefined') {
+        try {
+          window.languageManager.updatePageTranslations();
+          console.log('Language manager initialized in My Issues');
+        } catch (error) {
+          console.error('Error with language manager:', error);
+        }
+      } else {
+        console.warn('Language manager not available in My Issues');
+      }
+      
+      // Initialize page
+      loadIssues();
+    };
+  </script>
+</body>
+</html>
