@@ -131,7 +131,6 @@
         <label>Password</label>
         <input type="password" id="password" placeholder="Enter admin password" required>
       </div>
-      <div id="error-message" style="color: #dc3545; margin-bottom: 15px; display: none;"></div>
       <button type="submit" class="btn">Access Dashboard</button>
     </form>
 
@@ -155,18 +154,17 @@
       
       // Simple demo authentication
       if (username === 'admin' && password === 'demo123') {
-        // Store admin session using localStorage instead of sessionStorage for better persistence
+        // Store admin session
         const adminData = {
           name: 'Admin User',
           username: username,
-          loginTime: new Date().toISOString(),
-          isLoggedIn: true
+          loginTime: new Date().toISOString()
         };
-        localStorage.setItem('adminData', JSON.stringify(adminData));
-      
+        sessionStorage.setItem('adminData', JSON.stringify(adminData));
+        
         showNotification('Login successful! Redirecting to dashboard...', 'success');
         setTimeout(() => {
-          window.location.href = '../Dashboard/index.html';
+          window.location.href = '/dashboard';
         }, 1500);
       } else {
         document.getElementById('error-message').textContent = 'Invalid username or password';

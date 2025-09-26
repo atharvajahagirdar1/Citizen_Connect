@@ -316,22 +316,22 @@
 
     <!-- Navigation Cards -->
     <div class="nav-cards">
-      <div class="nav-card" onclick="window.location.href='../Civic Issue Management Portal/index.html'">
+      <div class="nav-card" onclick="window.location.href='/civic-issues'">
         <div class="nav-icon">🚨</div>
         <h3>Civic Issues Management</h3>
         <p>Manage and track civic issues reported by citizens</p>
       </div>
-      <div class="nav-card" onclick="window.location.href='../Notification Auto Management/index.html'">
+      <div class="nav-card" onclick="window.location.href='/notifications'">
         <div class="nav-icon">🔔</div>
         <h3>Notification Management</h3>
         <p>Automated notification system for issue updates</p>
       </div>
-      <div class="nav-card" onclick="window.location.href='../Reports and Analysis/index.html'">
+      <div class="nav-card" onclick="window.location.href='/reports'">
         <div class="nav-icon">📊</div>
         <h3>Reports & Analytics</h3>
         <p>Comprehensive reporting and data analytics</p>
       </div>
-      <div class="nav-card" onclick="window.location.href='../Worker or Volenteer Management/index.html'">
+      <div class="nav-card" onclick="window.location.href='/workers'">
         <div class="nav-icon">👥</div>
         <h3>Worker Management</h3>
         <p>Manage workers, schedules, and task assignments</p>
@@ -656,38 +656,25 @@ Date: ${formatDate(issue.timestamp)}`);
 
     // Session Management
     function checkAuthentication() {
-      const adminData = localStorage.getItem('adminData');
+      const adminData = sessionStorage.getItem('adminData');
       console.log('Checking authentication, adminData:', adminData);
       
       if (!adminData) {
         console.log('No admin data found, redirecting to login');
-        window.location.href = '../Login/index.html';
-        return false;
-      }
-      
-      // Parse the admin data and check if user is logged in
-      const admin = JSON.parse(adminData);
-      if (!admin.isLoggedIn) {
-        console.log('User not logged in, redirecting to login');
-        window.location.href = '../Login/index.html';
+        window.location.href = '/login';
         return false;
       }
       
       // Update admin badge with admin name
+      const admin = JSON.parse(adminData);
       console.log('Admin data found:', admin);
       document.querySelector('.admin-badge').textContent = admin.username;
       return true;
     }
 
     function logout() {
-      // Remove the isLoggedIn flag but keep other data
-      const adminData = localStorage.getItem('adminData');
-      if (adminData) {
-        const admin = JSON.parse(adminData);
-        admin.isLoggedIn = false;
-        localStorage.setItem('adminData', JSON.stringify(admin));
-      }
-      window.location.href = '../Login/index.html';
+      sessionStorage.removeItem('adminData');
+      window.location.href = '/login';
     }
 
     // Check authentication on page load
