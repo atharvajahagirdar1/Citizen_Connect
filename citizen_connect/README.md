@@ -121,13 +121,26 @@ npm run dev
 
 ## Deployment Options
 
-### Option 1: GitHub Pages (Static Hosting)
-Perfect for hosting the static HTML/CSS/JS files. Note: Server functionality will be limited.
+### Option 1: GitHub Pages (Static Hosting) - RECOMMENDED
+Perfect for hosting the static HTML/CSS/JS files. **This is the easiest option!**
 
-### Option 2: Full Deployment (Recommended)
+#### Quick Deploy Steps:
+1. Push your code to GitHub
+2. Go to Settings > Pages in your GitHub repository
+3. Select source: Deploy from a branch
+4. Choose main branch and root folder
+5. Your app will be live at: `https://YOUR_USERNAME.github.io/citizen-connect`
+
+#### Important Notes:
+- Your `index.html` is already configured as the entry point
+- The `.nojekyll` file prevents Jekyll processing issues
+- Node.js dependencies are excluded via `.gitignore`
+- All internal links use relative paths (perfect for GitHub Pages)
+
+### Option 2: Full Deployment (Advanced)
 Use platforms like Heroku, Vercel, or Railway for full Express.js backend support.
 
-### Option 3: Hybrid Approach
+### Option 3: Hybrid Approach (Advanced)
 - Host static pages on GitHub Pages
 - Deploy backend server separately on a cloud platform
 
