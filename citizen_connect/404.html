@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citizen Connect - Redirecting...</title>
+    <script>
+        // GitHub Pages SPA routing fix
+        // This script captures 404 errors and redirects to the main index.html
+        // where the client-side routing can handle the request
+        
+        (function() {
+            // Get the current path
+            const currentPath = window.location.pathname;
+            const currentHash = window.location.hash;
+            const currentSearch = window.location.search;
+            
+            // Store the original path in sessionStorage for the main app to handle
+            sessionStorage.setItem('gh_pages_redirect', currentPath + currentSearch + currentHash);
+            
+            // Redirect to the main index.html
+            const basePath = currentPath.split('/').slice(0, -1).join('/') || '/';
+            const redirectUrl = basePath + '/index.html';
+            
+            // Redirect immediately
+            window.location.replace(redirectUrl);
+        })();
+    </script>
+</head>
+<body>
+    <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+        <h2>Redirecting...</h2>
+        <p>If you are not redirected automatically, please <a href="/index.html">click here</a>.</p>
+    </div>
+</body>
+</html>

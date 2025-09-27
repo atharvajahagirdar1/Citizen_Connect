@@ -651,28 +651,32 @@ Date: ${formatDate(issue.timestamp)}`);
       return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     }
 
-    // Navigation functions with authentication checks
+    // Navigation functions with authentication checks and GitHub Pages compatibility
     function navigateToCivicIssues() {
       if (checkAuthentication()) {
-        window.location.href = '../Civic Issue Management Portal/index.html';
+        // Use absolute path for GitHub Pages compatibility
+        window.location.href = '/Admin UI/Civic Issue Management Portal/index.html';
       }
     }
 
     function navigateToNotifications() {
       if (checkAuthentication()) {
-        window.location.href = '../Notification Auto Management/index.html';
+        // Use absolute path for GitHub Pages compatibility
+        window.location.href = '/Admin UI/Notification Auto Management/index.html';
       }
     }
 
     function navigateToReports() {
       if (checkAuthentication()) {
-        window.location.href = '../Reports and Analysis/index.html';
+        // Use absolute path for GitHub Pages compatibility
+        window.location.href = '/Admin UI/Reports and Analysis/index.html';
       }
     }
 
     function navigateToWorkerManagement() {
       if (checkAuthentication()) {
-        window.location.href = '../Worker or Volenteer Management/index.html';
+        // Use absolute path for GitHub Pages compatibility
+        window.location.href = '/Admin UI/Worker or Volenteer Management/index.html';
       }
     }
 

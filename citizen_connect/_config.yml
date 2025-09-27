@@ -1,0 +1,31 @@
+# GitHub Pages Configuration
+# This file configures GitHub Pages for proper SPA routing
+
+# Disable Jekyll processing
+plugins:
+  - jekyll-redirect-from
+
+# Configure redirects for SPA routing
+redirect_from:
+  json: false
+
+# Ensure proper handling of HTML files
+include:
+  - "*.html"
+  - "*.js"
+  - "*.css"
+  - "*.json"
+  - "*.png"
+  - "*.jpg"
+  - "*.jpeg"
+  - "*.gif"
+  - "*.svg"
+
+# Exclude unnecessary files
+exclude:
+  - "node_modules"
+  - "package.json"
+  - "package-lock.json"
+  - "README.md"
+  - ".git"
+  - ".gitignore"
