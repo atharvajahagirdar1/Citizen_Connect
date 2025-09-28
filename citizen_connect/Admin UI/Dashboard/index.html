@@ -654,29 +654,29 @@ Date: ${formatDate(issue.timestamp)}`);
     // Navigation functions with authentication checks and GitHub Pages compatibility
     function navigateToCivicIssues() {
       if (checkAuthentication()) {
-        // Use absolute path for GitHub Pages compatibility
-        window.location.href = '/Admin UI/Civic Issue Management Portal/index.html';
+        // Use relative path for GitHub Pages compatibility
+        window.location.href = '../Civic Issue Management Portal/index.html';
       }
     }
 
     function navigateToNotifications() {
       if (checkAuthentication()) {
-        // Use absolute path for GitHub Pages compatibility
-        window.location.href = '/Admin UI/Notification Auto Management/index.html';
+        // Use relative path for GitHub Pages compatibility
+        window.location.href = '../Notification Auto Management/index.html';
       }
     }
 
     function navigateToReports() {
       if (checkAuthentication()) {
-        // Use absolute path for GitHub Pages compatibility
-        window.location.href = '/Admin UI/Reports and Analysis/index.html';
+        // Use relative path for GitHub Pages compatibility
+        window.location.href = '../Reports and Analysis/index.html';
       }
     }
 
     function navigateToWorkerManagement() {
       if (checkAuthentication()) {
-        // Use absolute path for GitHub Pages compatibility
-        window.location.href = '/Admin UI/Worker or Volenteer Management/index.html';
+        // Use relative path for GitHub Pages compatibility
+        window.location.href = '../Worker or Volenteer Management/index.html';
       }
     }
 
@@ -690,7 +690,8 @@ Date: ${formatDate(issue.timestamp)}`);
       
       if (!adminData) {
         console.log('No admin data found, redirecting to login');
-        window.location.href = '../Login/index.html';
+        // Use absolute path from root for GitHub Pages compatibility
+        window.location.href = '/Admin UI/Login/index.html';
         return false;
       }
       
@@ -703,7 +704,8 @@ Date: ${formatDate(issue.timestamp)}`);
 
     function logout() {
       sessionStorage.removeItem('adminData');
-      window.location.href = '../Login/index.html';
+      // Use absolute path from root for GitHub Pages compatibility
+      window.location.href = '/Admin UI/Login/index.html';
     }
 
     // Check authentication on page load
